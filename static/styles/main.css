@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+:root {
+    --val: 0;
+    }
+::selection{
+    background: rgba(var(--val), var(--val), var(--val),0.5);
+}
+html{
+    background: linear-gradient(150deg, rgba(123, 64, 110, 0.7) 8.97%, rgba(171, 52, 52, 0.7) 80.31%);
+    background-color: rgb(var(--val), var(--val), var(--val));
+    background-size: cover;
+    background-attachment: fixed;
+    transition: 0.3s;
+    font-family: 'Fredoka', 'sans-serif';
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+.content{
+    margin: 5%;
+}
+.navbar {
+    width: 100%;
+    padding: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:  rgba(var(--val), var(--val), var(--val), 0.4);
+}
+
+.bar-items {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    padding: 10px;
+    align-items: center;
+}
+
+.navigator {
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 15px;
+    transition: 0.3s;
+}
+
+.navigator:hover {
+    background-color: rgba(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)), 0.1);
+}
+
+.home:hover {
+    background-color: transparent;
+}
+
+
+h1,h2,h3,p,li,em,span{
+    color: rgb(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)));
+    font-weight: 400;
+}
+
+.bold{
+    font-weight: 500;
+}
+.icon {
+    width: 25px;
+    height: 25px;
+}
+
+.title {
+    font-size: 4em;
+}
+
+.fillvector {
+    fill: rgb(calc(225 - var(--val)),calc(225 - var(--val)),calc(225 - var(--val)));
+}
+
+.strokevector {
+    stroke: rgb(calc(225 - var(--val)),calc(225 - var(--val)),calc(225 - var(--val)));
+}
+
+button {
+    font-family: 'Fredoka', sans-serif;
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: fit-content;
+    cursor: pointer;
+    padding: 12px 14px 12px 14px;
+    border: none;
+    border-radius: 18px;
+    background:  rgba(var(--val), var(--val), var(--val), 0.3);
+}
+button:hover {
+    box-shadow: 0 0 20px rgba(calc(225 - var(--val)),calc(225 - var(--val)),calc(225 - var(--val)), 0.2);
+}
+.button h2{
+    margin: 0;
+}
+.navigator h3,h2,p{
+    margin: 0;
+}
+
+a{
+    text-decoration: none;
+    color: rgb(170, 82, 82);
+    cursor: pointer;
+}
+
+input[type="file"] {
+    display: none;
+}
+.mikro{
+    width: 20px;
+    height: 20px;
+}
+code{
+    background-color: rgba(var(--val), var(--val), var(--val), 0.2);
+    padding: 5px;
+    border-radius: 5px;
+}
+li{
+    margin: 5px;
+}
+@media screen and (max-width: 1250px) {
+    .mobile {
+        display: none;
+    }
+    .dropdown-content{
+        width: 75px;
+    }
+
+}
+
+@media screen and (max-width: 768px) {
+    .droparrowdown {
+        display: none;
+    }
+
+    .dropdown-content {
+        transform: none;
+        width: 50px;
+    }
+    .dropdown-content .navigator{
+        padding: 10px 0 10px 0;
+    }
+    .navigator {
+        justify-content: center;
+    }
+}
+
+.truncated {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

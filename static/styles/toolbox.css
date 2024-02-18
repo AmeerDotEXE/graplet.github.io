@@ -1,0 +1,59 @@
+.blocklyTreeLabel,.blocklyFlyoutButton .blocklyText{
+    color: rgb(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)));
+}
+
+.zelos-renderer.graplet-theme .blocklyFlyoutLabelText{
+    fill: rgb(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)));
+    font-family: 'Fredoka';
+    font-weight: 400;
+}
+
+.blocklyTreeSelected .blocklyTreeLabel{
+    color : rgb(var(--val), var(--val), var(--val));
+}
+
+.blocklyToolboxContents {
+    padding: 0.5em;
+}
+
+.blocklyTreeRow {
+    padding: 3px;
+    margin-bottom: 0.5em;
+    border-radius: 4px;
+}
+
+.blocklyToolboxDiv{
+    background-color: rgba(var(--val), var(--val), var(--val), 0.1);
+    backdrop-filter: blur(4px);
+}
+
+.blocklyMainBackground{
+    stroke: none;
+}
+
+.blocklySvg{
+    background-color: transparent;
+}
+.blocklyFlyout{
+    backdrop-filter: blur(4px);
+}
+.blocklyFlyoutBackground{
+    fill: rgba(var(--val), var(--val), var(--val), 0.1);
+}
+.blocklyFlyoutButton{
+    fill: transparent;
+    transition: 0.3s fill;
+}
+
+.blocklyFlyoutButton .blocklyText{
+    font-family: 'Fredoka', 'sans-serif';
+}
+.blocklyFlyoutButton:hover,.blocklyScrollbarHandle,.blocklyScrollbarHandle:hover{
+    fill: rgba(var(--val), var(--val), var(--val), 0.2);
+}
+.blocklyFlyoutButtonShadow{
+    fill: transparent;
+}
+.blocklyTreeSeparator {
+    border-bottom: solid rgb(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val))) 1px;
+}
