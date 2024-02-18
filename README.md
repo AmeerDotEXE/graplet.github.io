@@ -1,5 +1,6 @@
-# Graplet
+# About Graplet
 ## Supreme Block-Based Bot Creator for Discord
+*© 2024 Heliacer*
 
 
-Work in progress, Beta. 
+- Work in progress, join our [support server](https://discord.gg/5GWccwuWYU) for more info.
