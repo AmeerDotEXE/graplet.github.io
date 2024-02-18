@@ -136,7 +136,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "output_event",
-  "message0": "ouput of event  %1",
+  "message0": "ouputs of event  %1",
   "args0": [
     {
       "type": "input_value",
@@ -147,7 +147,7 @@ Blockly.defineBlocksWithJsonArray([
   "inputsInline": true,
   "output": "Array",
   "colour": "%{BKY_INSTANCE_HUE}",
-  "tooltip": "Retrieves a list of events associated with a boolean condition. For example, if the boolean condition is <Channel deleted?>, the output will be an array of events, such as 'Channel created', 'Channel updated', 'Channel deleted', or 'Pins updated'. This output can then be utilized further, such as by extracting specific properties like the channel name.",
+  "tooltip": "Retrieves a list of outputs associated with a Event boolean condition. For example, if the boolean condition is <Channel deleted?>, the output will be an array of output(s), such as [Channel]. This can then be utilized further, such as by extracting specific properties like the name of the channel.",
   "helpUrl": ""
 },
 {
