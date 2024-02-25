@@ -1,5 +1,11 @@
+javascript.javascriptGenerator.forBlock['text_input'] = function(block, generator) {
+  var code = `"${block.getFieldValue('TEXT')}"`;
+  return [code, javascript.Order.NONE];
+};
+
+
 javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
-  const LOG = generator.valueToCode(block, 'LOG', javascript.Order.ATOMIC);
+  const LOG = generator.valueToCode(block, 'LOG', javascript.Order.NONE);
   return `console.log(${LOG});`};
   
 // ACTIONS

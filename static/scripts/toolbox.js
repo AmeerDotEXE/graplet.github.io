@@ -11,12 +11,22 @@ var toolbox = {
             "text": "Actions"
           },
           {
-            'type': 'client_login',
-            'kind': 'block',
+            type : 'client_login',
+            kind : 'block',
             inputs: {
+              LOGIN_INPUT: {
+                block: {
+                  type: 'variables_get',
+                  fields: {
+                    VAR: {
+                      name: 'client',
+                    },
+                  },
+                }
+              },
               TOKEN_INPUT : {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: 'Your token here',
                   },
@@ -24,6 +34,34 @@ var toolbox = {
               }
             }
           },
+          {
+            type : "get_by_id",
+            kind : "block",
+            inputs: {
+              ID_INPUT : {
+                shadow: {
+                  type: 'math_number',
+                  fields: {
+                    NUM: 1,
+                  },
+                },
+              },
+            },
+          },
+          {
+            type: 'send_message',
+            kind: 'block',
+            inputs : {
+              CONTENT :{
+                shadow : {
+                  type: 'text_input',
+                  fields : {
+                    TEXT : 'Hello!'
+                  }
+                }
+              }
+            }
+          }
         ]
       },
       {
@@ -232,13 +270,6 @@ var toolbox = {
           {
             "kind": "label",
             "text": "Math"
-          },
-          {
-            type: 'math_number',
-            kind: 'block',
-            fields: {
-              NUM: 123,
-            },
           },
           {
             type: 'math_arithmetic',
@@ -464,19 +495,12 @@ var toolbox = {
             inputs: {
               LOG: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: 'abc',
                   },
                 },
               },
-            },
-          },
-          {
-            type: 'text',
-            kind: 'block',
-            fields: {
-              TEXT: '',
             },
           },
           {
@@ -499,7 +523,7 @@ var toolbox = {
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: '',
                   },
@@ -513,7 +537,7 @@ var toolbox = {
             inputs: {
               VALUE: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -527,7 +551,7 @@ var toolbox = {
             inputs: {
               VALUE: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: '',
                   },
@@ -554,7 +578,7 @@ var toolbox = {
               },
               FIND: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -610,7 +634,7 @@ var toolbox = {
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -627,7 +651,7 @@ var toolbox = {
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -641,7 +665,7 @@ var toolbox = {
             inputs: {
               SUB: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: '',
                   },
@@ -649,7 +673,7 @@ var toolbox = {
               },
               TEXT: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: '',
                   },
@@ -663,7 +687,7 @@ var toolbox = {
             inputs: {
               FROM: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: '',
                   },
@@ -671,7 +695,7 @@ var toolbox = {
               },
               TO: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: '',
                   },
@@ -679,7 +703,7 @@ var toolbox = {
               },
               TEXT: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: '',
                   },
@@ -693,7 +717,7 @@ var toolbox = {
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: '',
                   },
@@ -705,12 +729,12 @@ var toolbox = {
             type: 'text_prompt_ext',
             kind: 'block',
             fields: {
-              TYPE: 'TEXT',
+              type: 'text_input',
             },
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -849,7 +873,7 @@ var toolbox = {
             inputs: {
               DELIM: {
                 shadow: {
-                  type: 'text',
+                  type: 'text_input',
                   fields: {
                     TEXT: ',',
                   },

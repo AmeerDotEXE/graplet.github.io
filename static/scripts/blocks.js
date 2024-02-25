@@ -1,5 +1,20 @@
 Blockly.defineBlocksWithJsonArray([
 {
+  "type": "text_input",
+  "message0": "%1",
+  "args0": [
+    {
+      "type": "field_input",
+      "name": "TEXT",
+      "text": ""
+    }
+  ],
+  "output": "String",
+  "colour": 0,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
   "type": "console_log",
   "message0": "log in console %1",
   "args0": [
@@ -196,6 +211,78 @@ Blockly.defineBlocksWithJsonArray([
   "output": null,
   "colour": '%{BKY_INSTANCE_HUE}',
   "tooltip": " Retrieves a specific property of an object or variable",
+  "helpUrl": ""
+},
+{
+  "type": "get_by_id",
+  "message0": "get instance %1 %2 %3 %4",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "INSTANCES",
+      "options": [
+        [
+          "guild",
+          "GUILD"
+        ],
+        [
+          "channel",
+          "CHANNEL"
+        ],
+        [
+          "user",
+          "USER"
+        ],
+        [
+          "emoji",
+          "EMOJI"
+        ],
+        [
+          "invite",
+          "INVITE"
+        ]
+      ]
+    },
+    {
+      "type": "field_label_serializable",
+      "name": "BY",
+      "text": "by ID"
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "input_value",
+      "name": "ID_INPUT",
+      "check": "Number"
+    }
+  ],
+  "inputsInline": true,
+  "output": null,
+  "colour": '%{BKY_ACTION_HUE}',
+  "tooltip": "Retrieves an instance or object by its unique identifier (ID)",
+  "helpUrl": ""
+},
+{
+  "type": "send_message",
+  "message0": "send message in channel %1 Text content: %2",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "CHANNEL",
+      "check": "Channel"
+    },
+    {
+      "type": "input_value",
+      "name": "CONTENT",
+      "check": "String"
+    }
+  ],
+  "inputsInline": false,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": '%{BKY_ACTION_HUE}',
+  "tooltip": "Sends a message to a specified Channel of a Guild.",
   "helpUrl": ""
 }
 ])

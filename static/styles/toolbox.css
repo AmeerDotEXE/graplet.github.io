@@ -1,9 +1,9 @@
 .blocklyTreeLabel,.blocklyFlyoutButton .blocklyText{
-    color: rgb(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)));
+    color: var(--default-text);
 }
 
 .zelos-renderer.graplet-theme .blocklyFlyoutLabelText{
-    fill: rgb(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)));
+    fill: var(--default-text);
     font-family: 'Fredoka';
     font-weight: 400;
 }
@@ -55,5 +55,5 @@
     fill: transparent;
 }
 .blocklyTreeSeparator {
-    border-bottom: solid rgb(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val))) 1px;
+    border-bottom: solid var(--default-text) 1px;
 }
