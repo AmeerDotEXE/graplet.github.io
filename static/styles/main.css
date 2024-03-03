@@ -23,7 +23,7 @@ body {
 }
 
 .content{
-    margin: 5%;
+    margin: 60px;
 }
 .navbar {
     width: 100%;
@@ -145,6 +145,22 @@ code{
 li{
     margin: 5px;
 }
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: rgba(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)), 0.5);
+    border-radius: 10px;
+    margin: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--val), var(--val), var(--val), 0.5);
+}
+
+
 @media screen and (max-width: 1250px) {
     .mobile {
         display: none;

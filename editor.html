@@ -165,12 +165,17 @@
 	<!-- Settings INCLUDE: DOWNLOAD SETTINGS; ARCHIVE SETTINGS-->
 	<div class="tabelement" style="display: none;"><p style="margin: 0;">WORK IN PROGRESS!!<br><br>TODO: Change image with Image URL, delete Project. Furthermore, edit code genreration configs.<br><br><i>Yes i know i need to add proper code generation</i></p></div>
 	<script>
-		var tabelements = document.getElementsByClassName("tabelement");
-		Array.from(tabelements).forEach(function (element) {
-				element.style.height = window.innerHeight - 120 + 'px';
-
+		function resizeTabelements(){
+			var tabelements = document.getElementsByClassName("tabelement");
+			Array.from(tabelements).forEach(function (element) {
+					element.style.height = window.innerHeight - 120 + 'px';
+	
+			});
+		}
+		resizeTabelements();
+		document.addEventListener("resize", (event) => {
+			resizeTabelements();
 		});
-
 		function SwitchTabs(event) {
 			CurrentActive = document.getElementsByClassName('active')[0];
 			CurrentActive.classList.remove('active');
