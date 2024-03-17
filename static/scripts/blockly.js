@@ -28,7 +28,7 @@ Blockly.Extensions.register('dynamic_property_of',
 
 
 Blockly.Extensions.registerMutator(
-  'send_message_mutator',send_message_mutator_method,undefined,['lists_create_with_item']);
+  'embed_builder_mutator',embed_builder_method,undefined,[]);
 
 var Workspace = Blockly.inject("blocklyDiv", { 
   renderer: "zelos",

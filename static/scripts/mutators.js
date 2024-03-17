@@ -1,57 +1,27 @@
-send_message_mutator_method =   {
+embed_builder_method =   {
   saveExtraState: function() {
     return {
-      'itemCount': this.itemCount_,
+      'embedOptions': this.embedOptions,
     };
   },
   
   loadExtraState: function(state) {
-    this.itemCount_ = state['itemCount'];
+    this.embedOptions = state['embedOptions'];
     this.updateShape();
   },
   decompose: function(workspace) {
-    var topBlock = workspace.newBlock('options_actions_container');
+    var topBlock = workspace.newBlock('instances_options_embed_mutator');
     topBlock.initSvg();
-  
-    var connection = topBlock.getInput('STACK').connection;
-    for (var i = 0; i < this.itemCount_; i++) {
-      // TODO: Actual items naga
-      var itemBlock = workspace.newBlock('lists_create_with_item');
-      itemBlock.initSvg();
-      connection.connect(itemBlock.previousConnection);
-      connection = itemBlock.nextConnection;
-    }
-  
     return topBlock;
   },
   
   compose: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('STACK');
-
-    var connections = [];
-    while (itemBlock && !itemBlock.isInsertionMarker()) {
-      connections.push(itemBlock.valueConnection_);
-      itemBlock = itemBlock.nextConnection &&
-          itemBlock.nextConnection.targetBlock();
-    }
-  
-    for (var i = 0; i < this.itemCount_; i++) {
-      var connection = this.getInput('ADD' + i).connection.targetConnection;
-      if (connection && connections.indexOf(connection) == -1) {
-        connection.disconnect();
-      }
-    }
-  
-    this.itemCount_ = connections.length;
+    // TODO : check for checked and then add items
+    this.embedOptions = []
     this.updateShape();
-
   },
   updateShape: function() {
-    for (var a = 0; a < this.itemCount_; a++)
-        if (!this.getInput("ADD" + a)) {
-          this.appendValueInput("ADD" + a)
-        }
-    for (a = this.itemCount_; this.getInput("ADD" + a); a++)
-        this.removeInput("ADD" + a)
+    // TODO: add value inputs based on list
+    console.log(this.embedOptions)
   }
 }

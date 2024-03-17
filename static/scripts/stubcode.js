@@ -103,3 +103,10 @@ javascript.javascriptGenerator.forBlock['field_date'] = function(block, generato
   var code = time;
   return [code, javascript.Order.NONE];
 };
+
+
+javascript.javascriptGenerator.forBlock['embed_builder'] = function(block, generator) {
+  // TODO: add mutators & Code
+  var code = '\n';
+  return [code, javascript.Order.NONE];
+};

@@ -7,6 +7,10 @@ var toolbox = {
         "colour" : '%{BKY_ACTION_HUE}',
         "contents": [
           {
+            kind: 'label',
+            text: 'Actions'
+          },
+          {
             type : 'client_login',
             kind : 'block',
             inputs: {
@@ -66,6 +70,10 @@ var toolbox = {
         "colour" : '%{BKY_EVENT_HUE}',
         "contents": [
           {
+            kind: 'label',
+            text: 'Event Hats'
+          },
+          {
             type: 'once',
             kind: 'block',
             inputs : {
@@ -98,6 +106,10 @@ var toolbox = {
             }
           },
           {
+            kind: 'label',
+            text: 'Event Bools'
+          },
+          {
             'type': 'clientready',
             'kind': 'block',
           },
@@ -119,6 +131,10 @@ var toolbox = {
         "colour" : '%{BKY_INSTANCE_HUE}',
         "contents": [
           {
+            kind: 'label',
+            text: 'Instances'
+          },
+          {
             'type': 'property_of',
             'kind': 'block',
           },
@@ -129,6 +145,20 @@ var toolbox = {
           {
             type: 'field_date',
             kind: 'block'
+          },
+          {
+            type: 'embed_builder',
+            kind: 'block',
+            inputs: {
+              DESCRIPTION: {
+                shadow: {
+                  type: 'input',
+                  fields: {
+                    TEXT: '' 
+                  }
+                }
+              }
+            }
           }
         ]
       },
@@ -140,6 +170,10 @@ var toolbox = {
         name: 'Logic',
         categorystyle: 'logic_category',
         contents: [
+          {
+            kind: 'label',
+            text: 'Logic'
+          },
           {
             type: 'controls_if',
             kind: 'block',
@@ -221,6 +255,10 @@ var toolbox = {
         categorystyle: 'loop_category',
         contents: [
           {
+            kind: 'label',
+            text: 'Loops'
+          },
+          {
             type: 'controls_repeat_ext',
             kind: 'block',
             inputs: {
@@ -299,6 +337,10 @@ var toolbox = {
         name: 'Math',
         categorystyle: 'math_category',
         contents: [
+          {
+            kind: 'label',
+            text: 'Math'
+          },
           {
             type: 'math_arithmetic',
             kind: 'block',
@@ -513,6 +555,10 @@ var toolbox = {
         name: 'Text',
         categorystyle: 'text_category',
         contents: [
+          {
+            kind: 'label',
+            text: 'Text'
+          },
           {
             type: 'console_log',
             kind: 'block',
@@ -767,6 +813,10 @@ var toolbox = {
         categorystyle: 'list_category',
         contents: [
           {
+            kind: 'label',
+            text: 'Lists'
+          },
+          {
             type: 'lists_create_with',
             kind: 'block',
           },
@@ -918,6 +968,10 @@ var toolbox = {
         categorystyle: 'colour_category',
         name: 'Colour',
         contents: [
+          {
+            kind: 'label',
+            text: 'Colour'
+          },
           {
             type: 'colour_hsv_sliders',
             kind: 'block'

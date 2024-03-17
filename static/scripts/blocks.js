@@ -275,7 +275,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "send_message",
-  "message0": "send message in channel %1 Text content: %2",
+  "message0": "send message in channel %1 Text content: %2 Optional Embed(s): %3",
   "args0": [
     {
       "type": "input_value",
@@ -286,9 +286,12 @@ Blockly.defineBlocksWithJsonArray([
       "type": "input_value",
       "name": "CONTENT",
       "check": "String"
+    },
+    {
+      "type": "input_value",
+      "name": "EMBEDS"
     }
   ],
-  "mutator" : 'send_message_mutator',
   "inputsInline": false,
   "previousStatement": null,
   "nextStatement": null,
@@ -297,19 +300,68 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "options_actions_container",
-  "message0": "options %1 %2",
+  "type": "embed_builder",
+  "message0": "Embed Builder %1 Description %2",
   "args0": [
     {
       "type": "input_dummy"
     },
     {
-      "type": "input_statement",
-      "name": "NAME"
+      "type": "input_value",
+      "name": "DESCRIPTION"
     }
   ],
-  "colour": '%{BKY_ACTION_HUE}',
+  "mutator" : 'embed_builder_mutator',
+  "inputsInline": false,
+  "output": null,
+  "colour": '%{BKY_INSTANCE_HUE}',
   "tooltip": "",
   "helpUrl": ""
-}
+},
+{
+  "type": "instances_options_embed_mutator",
+  "message0": "Description: %1 %2 Title %3 %4 Color %5 %6 Author %7 %8 Footer %9",
+  "args0": [
+    {
+      "type": "field_checkbox",
+      "name": "DESCRIPTION",
+      "checked": true
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "field_checkbox",
+      "name": "TITLE",
+      "checked": false
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "field_checkbox",
+      "name": "COLOR",
+      "checked": false
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "field_checkbox",
+      "name": "AUTHOR",
+      "checked": false
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "field_checkbox",
+      "name": "FOOTER",
+      "checked": false
+    }
+  ],
+  "colour": '%{BKY_INSTANCE_HUE}',
+  "tooltip": "",
+  "helpUrl": ""
+},
 ])
