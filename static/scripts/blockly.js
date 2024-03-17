@@ -4,10 +4,13 @@ Blockly.Msg.INSTANCE_HUE = 290;
 Blockly.utils.colour.setHsvSaturation(0.55); 
 Blockly.utils.colour.setHsvValue(0.78);  
 
+let HasChanges = false;
+
 const graplet_theme = Blockly.Theme.defineTheme('graplet', {
   'base': Blockly.Themes.Zelos,
-  'startHats': true
+  'startHats': true,
 });
+
 
 Blockly.Extensions.register('dynamic_property_of',
   function() {
@@ -17,11 +20,16 @@ Blockly.Extensions.register('dynamic_property_of',
         function() {
           var options = [['...', 'NONE']];
           if (children[0] != undefined){
-            console.log(children[0].type);
+            console.log(children[0]);
           }
           return options;
         }), 'VALUE');
   });
+
+
+Blockly.Extensions.registerMutator(
+  'send_message_mutator',send_message_mutator_method,undefined,['lists_create_with_item']);
+
 var Workspace = Blockly.inject("blocklyDiv", { 
   renderer: "zelos",
   theme: graplet_theme,
@@ -36,7 +44,7 @@ var Workspace = Blockly.inject("blocklyDiv", {
   zoom: {
     controls: true,
     wheel: true,
-    startScale: 1.0,
+    startScale: 0.85,
     maxScale: 3,
     minScale: 0.3,
     scaleSpeed: 1.2,
@@ -45,6 +53,16 @@ var Workspace = Blockly.inject("blocklyDiv", {
   trashcan: true 
 });
 console.info('Blockly injected.');
+
+const options = {
+  contextMenu: true,
+  shortcut: true,
+};
+
+const copypaste = new CrossTabCopyPaste();
+copypaste.init(options, () => {
+  console.log('Copy paste plugin initiated.');
+});
 
 let PayloadBlocks;
 if (ProjectIDRoot != '') {
@@ -78,7 +96,7 @@ if (ProjectIDRoot != '') {
 
 } else {
   console.info("New Project Initiated. Default Blocks loading.");
-  PayloadBlocks = {"blocks":{"languageVersion":0,"blocks":[{"type":"client_login","id":"W]+YQB9c8EXGo{55avcc","x":10,"y":370,"inputs":{"LOGIN_INPUT":{"block":{"type":"variables_get","id":"M*w6UlN]/ttQE]y}qnJS","fields":{"VAR":{"id":"([95,9S@^5D.rAd}^;Eq"}}}},"TOKEN_INPUT":{"shadow":{"type":"text_input","id":"|@6%N7yiXT]2~x/#NZxw","fields":{"TEXT":"Your token here"}}}}},{"type":"project_run","id":"ho[i1|7%4!).j8MJMGql","x":10,"y":10,"next":{"block":{"type":"variables_set","id":"r4G!Rnm53_Cg#EraEOQi","fields":{"VAR":{"id":"([95,9S@^5D.rAd}^;Eq"}},"inputs":{"VALUE":{"block":{"type":"client","id":"Qlz;Va*T?S.3jfxc5p[|"}}}}}},{"type":"once","id":",C|sS|}n`-at928~}:#B","x":10,"y":190,"inputs":{"EVENT":{"block":{"type":"clientready","id":"E)))C#-c5*-)J%d[lK8@"}}},"next":{"block":{"type":"console_log","id":"vn`k?HF3$|}PPYAru#;y","inputs":{"LOG":{"shadow":{"type":"text_input","id":"~;]N7z2:N^EB:b*$yD~9","fields":{"TEXT":"Logged in!"}}}}}}}]},"variables":[{"name":"client","id":"([95,9S@^5D.rAd}^;Eq"}]};
+  PayloadBlocks = {"blocks":{"languageVersion":0,"blocks":[{"type":"client_login","id":".Q2+Vk+g`%qlZ5OEa;;_","x":-70,"y":430,"inputs":{"LOGIN_INPUT":{"block":{"type":"variables_get","id":"Wv`^}*/U7~yuYB;ajLzU","fields":{"VAR":{"id":"eQu:H?#u)Uu?a*E?7+??"}}}},"TOKEN_INPUT":{"shadow":{"type":"input","id":"F[rIyj-k[r*-7l#itoE]","fields":{"TEXT":"Your token here"}}}}},{"type":"once","id":"-b+q1;OCmJ]CAq,|0)p;","x":-70,"y":250,"inputs":{"CLIENT":{"block":{"type":"variables_get","id":"8An!FFT/5h/29,Z2|#^p","fields":{"VAR":{"id":"eQu:H?#u)Uu?a*E?7+??"}}}},"EVENT":{"block":{"type":"clientready","id":"ILv-1S+I9DF*)pD~?,Fg"}},"DO":{"block":{"type":"console_log","id":"*tzh|)MK9iGx09Rp$|_B","inputs":{"LOG":{"shadow":{"type":"input","id":"qy+}+eBfL9XZA!C|!-Eg","fields":{"TEXT":"client is ready!"}}}}}}}},{"type":"variables_set","id":"!ee1zJ|6-jLm;J_7mDQ+","x":-70,"y":150,"fields":{"VAR":{"id":"eQu:H?#u)Uu?a*E?7+??"}},"inputs":{"VALUE":{"block":{"type":"client","id":"tz55?Z6?_c`WP:mvN$ir"}}}}]},"variables":[{"name":"client","id":"eQu:H?#u)Uu?a*E?7+??"}]};
   Blockly.serialization.workspaces.load(PayloadBlocks, Workspace);
 }
 
@@ -118,13 +136,24 @@ function updateCode(event) {
   if (!supportedEvents.has(event.type)) return;
 
   const code = javascript.javascriptGenerator.workspaceToCode(Workspace);
+  HasChanges = true;
   document.getElementById('generated-code').textContent =  `const { Client, Events, GatewayIntentBits } = require('discord.js');\n${code}`;
 }
 Workspace.addChangeListener(updateCode);
 
+Workspace.addChangeListener(event => {
+  if (event.type === Blockly.Events.FINISHED_LOADING) {
+    console.log('Finished loading!')
+    HasChanges = false;
+  }
+});
+
+
 window.addEventListener("beforeunload", function(event) {
-  var confirmation = window.confirm();
-  if (!confirmation){
-    event.preventDefault();
+  if (HasChanges == true){
+    var confirmation = window.confirm();
+    if (!confirmation){
+      event.preventDefault();
+    }
   }
 });

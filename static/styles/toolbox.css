@@ -2,10 +2,26 @@
     color: var(--default-text);
 }
 
-.zelos-renderer.graplet-theme .blocklyFlyoutLabelText{
+.zelos-renderer.graplet-theme .blocklyFlyoutLabelText, .zelos-renderer.graplet-theme .blocklyText, .zelos-renderer.graplet-theme .blocklyFlyoutLabelText{
     fill: var(--default-text);
     font-family: 'Fredoka';
     font-weight: 400;
+
+}
+
+.zelos-renderer.graplet-theme .blocklyDropdownText{
+  fill: var(--default-text) !important;
+}
+
+.zelos-renderer.graplet-theme .blocklyHtmlInput{
+    font-family: 'Fredoka';
+    font-weight: 400;
+    color: black;
+}
+
+.zelos-renderer.graplet-theme .blocklyHtmlInput::selection{
+  color: white;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .blocklyTreeSelected .blocklyTreeLabel{
@@ -44,16 +60,69 @@
     fill: transparent;
     transition: 0.3s fill;
 }
-
-.blocklyFlyoutButton .blocklyText{
-    font-family: 'Fredoka', 'sans-serif';
-}
 .blocklyFlyoutButton:hover,.blocklyScrollbarHandle,.blocklyScrollbarHandle:hover{
     fill: rgba(var(--val), var(--val), var(--val), 0.2);
+}
+
+.blocklyScrollbarBackground:hover+.blocklyScrollbarHandle, .blocklyScrollbarHandle:hover{
+  fill: rgba(var(--val), var(--val), var(--val), 0.3);
 }
 .blocklyFlyoutButtonShadow{
     fill: transparent;
 }
 .blocklyTreeSeparator {
     border-bottom: solid var(--default-text) 1px;
+}
+
+
+.fieldColourSliderLabel span{
+  color: black
+}
+
+.blocklyDropDownDiv{
+  border-radius: 10px;
+}
+
+.fieldColourSlider{
+  margin: 0;
+}
+
+.fieldColourSliderContainer button{
+  padding: 0;
+}
+
+.blocklyMenuItemContent{
+  font-family: 'fredoka';
+}
+.zelos-renderer.graplet-theme.blocklyDropDownDiv .goog-menuitem-content{
+  color: var(--default-text);
+}
+.blocklyEditableText image {
+  filter: brightness(calc(1 - var(--val)));
+}
+
+.zelos-renderer.graplet-theme .blocklyNonEditableText>text, .zelos-renderer.graplet-theme .blocklyEditableText>text, .zelos-renderer.graplet-theme .blocklyNonEditableText>g>text, .zelos-renderer.graplet-theme .blocklyEditableText>g>text{
+  fill: black;
+}
+
+.blocklyMenuItemCheckbox{
+  filter: invert(calc(1 - var(--val)));
+}
+.blocklyTreeRowContentContainer input[type='search']{
+  background: transparent;
+  font-family: 'Fredoka';
+  font-weight: 400;
+  border: none;
+  margin-left: 0 !important;
+  width: 108px;
+  color: var(--default-text);
+}
+
+.blocklyTreeRowContentContainer input[type='search']::placeholder{
+  color: var(--default-text);
+}
+
+#blockly-d{
+  background-color: transparent !important;
+  padding: 0;
 }

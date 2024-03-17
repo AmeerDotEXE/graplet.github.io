@@ -1,24 +1,26 @@
 var ProjectIDRoot = window.location.hash.substring(1);
 
-openDatabase()
-  .then(db => {
-    console.log("Database opened successfully on ID Check:", db);
-    const transaction = db.transaction(["projects"]);
-    const objectStore = transaction.objectStore("projects");
-    const request = objectStore.get(parseInt(ProjectIDRoot));
-    request.onerror = (event) => {
-      alert("There was an error retrieving Data.");
-      console.error(event);
-    };
-    request.onsuccess = (event) => {
-      if (event.target.result == null){
-        window.location.href = 'projects.html';
-      }
+if (ProjectIDRoot){
+  openDatabase()
+    .then(db => {
+      console.log("Database opened successfully on ID Check:", db);
+      const transaction = db.transaction(["projects"]);
+      const objectStore = transaction.objectStore("projects");
+      const request = objectStore.get(parseInt(ProjectIDRoot));
+      request.onerror = (event) => {
+        alert("There was an error retrieving Data.");
+        console.error(event);
       };
-  })
-  .catch(error => {
-    console.error("Error opening database:", error);
-});
+      request.onsuccess = (event) => {
+        if (event.target.result == null){
+          window.location.href = 'projects.html';
+        }
+        };
+    })
+    .catch(error => {
+      console.error("Error opening database:", error);
+  });
+}
 
 function download() {
   const state = Blockly.serialization.workspaces.save(Workspace);
@@ -119,6 +121,7 @@ function save() {
         const objectStore = transaction.objectStore("projects");
         const request = objectStore.add(project);
         request.onsuccess = (event) => {
+          HasChanges = false;
           ProjectID = ProjectIDRoot = event.target.result;
           window.location.hash = '#' + ProjectID;
           console.log('ProjecID after: ' + ProjectID)
@@ -164,6 +167,7 @@ function save() {
             console.error(event);
           };
           requestUpdate.onsuccess = (event) => {
+            HasChanges = false;
             const defaultSvg = document.getElementById('save-default');
             const successSvg = document.getElementById('save-success');
             const labelSave = document.getElementById('save-label');

@@ -7,10 +7,6 @@ var toolbox = {
         "colour" : '%{BKY_ACTION_HUE}',
         "contents": [
           {
-            "kind": "label",
-            "text": "Actions"
-          },
-          {
             type : 'client_login',
             kind : 'block',
             inputs: {
@@ -26,7 +22,7 @@ var toolbox = {
               },
               TOKEN_INPUT : {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: 'Your token here',
                   },
@@ -54,7 +50,7 @@ var toolbox = {
             inputs : {
               CONTENT :{
                 shadow : {
-                  type: 'text_input',
+                  type: 'input',
                   fields : {
                     TEXT : 'Hello!'
                   }
@@ -70,24 +66,36 @@ var toolbox = {
         "colour" : '%{BKY_EVENT_HUE}',
         "contents": [
           {
-            "kind": "label",
-            "text": "Event Hats"
+            type: 'once',
+            kind: 'block',
+            inputs : {
+              CLIENT : {
+                block: {
+                  type: 'variables_get',
+                  fields: {
+                    VAR: {
+                      name: 'client',
+                    },
+                  },
+                }
+              },
+            }
           },
           {
-            'type': 'project_run',
-            'kind': 'block',
-          },
-          {
-            'type': 'once',
-            'kind': 'block',
-          },
-          {
-            'type': 'when',
-            'kind': 'block',
-          },
-          {
-            "kind": "label",
-            "text": "Event Bools"
+            type: 'when',
+            kind: 'block',
+            inputs : {
+              CLIENT : {
+                block: {
+                  type: 'variables_get',
+                  fields: {
+                    VAR: {
+                      name: 'client',
+                    },
+                  },
+                }
+              },
+            }
           },
           {
             'type': 'clientready',
@@ -111,10 +119,6 @@ var toolbox = {
         "colour" : '%{BKY_INSTANCE_HUE}',
         "contents": [
           {
-            "kind": "label",
-            "text": "Instances"
-          },
-          {
             'type': 'property_of',
             'kind': 'block',
           },
@@ -123,9 +127,9 @@ var toolbox = {
             'kind': 'block',
           },
           {
-            'type': 'output_event',
-            'kind': 'block',
-          },
+            type: 'field_date',
+            kind: 'block'
+          }
         ]
       },
       {
@@ -137,10 +141,6 @@ var toolbox = {
         categorystyle: 'logic_category',
         contents: [
           {
-            "kind": "label",
-            "text": "Logic"
-          },
-          {
             type: 'controls_if',
             kind: 'block',
           },
@@ -149,6 +149,24 @@ var toolbox = {
             kind: 'block',
             fields: {
               OP: 'EQ',
+            },
+            inputs: {
+              A: {
+                shadow: {
+                  type: 'input',
+                  fields : {
+                    TEXT : ''
+                  }       
+                }
+              },
+              B: {
+                shadow: {
+                  type: 'input',
+                  fields : {
+                    TEXT : ''
+                  }
+                }
+              }
             },
           },
           {
@@ -176,6 +194,24 @@ var toolbox = {
           {
             type: 'logic_ternary',
             kind: 'block',
+            inputs: {
+              THEN: {
+                shadow: {
+                  type: 'input',
+                  fields : {
+                    TEXT : ''
+                  }
+                }
+              },
+              ELSE: {
+                shadow: {
+                  type: 'input',
+                  fields : {
+                    TEXT : ''
+                  }
+                }
+              }
+            }
           },
         ],
       },
@@ -184,10 +220,6 @@ var toolbox = {
         name: 'Loops',
         categorystyle: 'loop_category',
         contents: [
-          {
-            "kind": "label",
-            "text": "Loops"
-          },
           {
             type: 'controls_repeat_ext',
             kind: 'block',
@@ -267,10 +299,6 @@ var toolbox = {
         name: 'Math',
         categorystyle: 'math_category',
         contents: [
-          {
-            "kind": "label",
-            "text": "Math"
-          },
           {
             type: 'math_arithmetic',
             kind: 'block',
@@ -486,28 +514,17 @@ var toolbox = {
         categorystyle: 'text_category',
         contents: [
           {
-            "kind": "label",
-            "text": "Text"
-          },
-          {
             type: 'console_log',
             kind: 'block',
             inputs: {
               LOG: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: 'abc',
                   },
                 },
               },
-            },
-          },
-          {
-            type: 'text_multiline',
-            kind: 'block',
-            fields: {
-              TEXT: '',
             },
           },
           {
@@ -523,7 +540,7 @@ var toolbox = {
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: '',
                   },
@@ -537,7 +554,7 @@ var toolbox = {
             inputs: {
               VALUE: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -551,7 +568,7 @@ var toolbox = {
             inputs: {
               VALUE: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: '',
                   },
@@ -578,7 +595,7 @@ var toolbox = {
               },
               FIND: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -634,7 +651,7 @@ var toolbox = {
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -651,7 +668,7 @@ var toolbox = {
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -665,7 +682,7 @@ var toolbox = {
             inputs: {
               SUB: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: '',
                   },
@@ -673,7 +690,7 @@ var toolbox = {
               },
               TEXT: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: '',
                   },
@@ -687,7 +704,7 @@ var toolbox = {
             inputs: {
               FROM: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: '',
                   },
@@ -695,7 +712,7 @@ var toolbox = {
               },
               TO: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: '',
                   },
@@ -703,7 +720,7 @@ var toolbox = {
               },
               TEXT: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: '',
                   },
@@ -717,7 +734,7 @@ var toolbox = {
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: '',
                   },
@@ -729,12 +746,12 @@ var toolbox = {
             type: 'text_prompt_ext',
             kind: 'block',
             fields: {
-              type: 'text_input',
+              type: 'input',
             },
             inputs: {
               TEXT: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: 'abc',
                   },
@@ -750,14 +767,6 @@ var toolbox = {
         categorystyle: 'list_category',
         contents: [
           {
-            "kind": "label",
-            "text": "Lists"
-          },
-          {
-            type: 'lists_create_with',
-            kind: 'block',
-          },
-          {
             type: 'lists_create_with',
             kind: 'block',
           },
@@ -765,6 +774,14 @@ var toolbox = {
             type: 'lists_repeat',
             kind: 'block',
             inputs: {
+              ITEM: {
+                shadow: {
+                  type: 'input',
+                  fields: {
+                    TEXT: ''
+                  }
+                }
+              },
               NUM: {
                 shadow: {
                   type: 'math_number',
@@ -873,7 +890,7 @@ var toolbox = {
             inputs: {
               DELIM: {
                 shadow: {
-                  type: 'text_input',
+                  type: 'input',
                   fields: {
                     TEXT: ',',
                   },
@@ -902,15 +919,8 @@ var toolbox = {
         name: 'Colour',
         contents: [
           {
-            "kind": "label",
-            "text": "Colour"
-          },
-          {
-            type: 'colour_picker',
-            kind: 'block',
-            fields: {
-              COLOUR: '#ff0000',
-            },
+            type: 'colour_hsv_sliders',
+            kind: 'block'
           },
           {
             type: 'colour_random',
@@ -952,7 +962,7 @@ var toolbox = {
             inputs: {
               COLOUR1: {
                 shadow: {
-                  type: 'colour_picker',
+                  type: 'colour_hsv_sliders',
                   fields: {
                     COLOUR: '#ff0000',
                   },
@@ -960,7 +970,7 @@ var toolbox = {
               },
               COLOUR2: {
                 shadow: {
-                  type: 'colour_picker',
+                  type: 'colour_hsv_sliders',
                   fields: {
                     COLOUR: '#3333ff',
                   },
@@ -993,5 +1003,10 @@ var toolbox = {
         custom: 'PROCEDURE',
         categorystyle: 'procedure_category',
       },
+      {
+        kind: 'search',
+        name: 'Search',
+        contents : [],
+      }
     ]
 };

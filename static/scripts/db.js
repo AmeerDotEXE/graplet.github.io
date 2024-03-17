@@ -1,4 +1,4 @@
-const DBName = "projectsDB";
+const DBName = "GrapletDB";
 const DBVersion = 1;
 
 function openDatabase() {
@@ -15,8 +15,10 @@ function openDatabase() {
 
     connection.onupgradeneeded = function(event) {
       const db = event.target.result;
-      const objectStore = db.createObjectStore("projects", { autoIncrement: true });
-      objectStore.createIndex("name", "name", { unique: true });
+      const ProjectStore = db.createObjectStore("projects", { autoIncrement: true });
+      const SettingsStore = db.createObjectStore("settings");
+      ProjectStore.createIndex("name", "name", { unique: true });
+      SettingsStore.createIndex("theme","theme")
     };
   });
 }

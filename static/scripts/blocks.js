@@ -1,6 +1,33 @@
 Blockly.defineBlocksWithJsonArray([
 {
-  "type": "text_input",
+  type: 'field_date',
+  message0: 'date: %1',
+  args0: [
+    {
+      type: 'field_date',
+      name: 'FIELDNAME',
+      date: '2020-02-20',
+    },
+  ],
+  "inputsInline": true,
+  "colour": "%{BKY_INSTANCE_HUE}",
+  "output" : "String"
+},
+{
+  type: 'colour_hsv_sliders',
+  message0: 'hsv %1',
+  args0: [
+    {
+      type: 'field_colour_hsv_sliders',
+      name: 'COLOUR',
+      colour: '#ff0000',
+    },
+  ],
+  output: 'Colour',
+  style: 'colour_blocks',
+},
+{
+  "type": "input",
   "message0": "%1",
   "args0": [
     {
@@ -31,37 +58,51 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },  
 {
-  "type": "project_run",
-  "message0": "%1 when this Project is run",
-  "args0": [
-    {
-      "type": "field_image",
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' width='512' height='512' x='0' y='0' viewBox='0 0 163.861 163.861' style='enable-background:new 0 0 512 512' xml:space='preserve' class=''%3E%3Cg%3E%3Cpath d='M34.857 3.613C20.084-4.861 8.107 2.081 8.107 19.106v125.637c0 17.042 11.977 23.975 26.75 15.509L144.67 97.275c14.778-8.477 14.778-22.211 0-30.686L34.857 3.613z' fill='%23ffffff' opacity='1' data-original='%23000000' class=''%3E%3C/path%3E%3C/g%3E%3C/svg%3E",
-      "width": 15,
-      "height": 15,
-      "alt": "*",
-      "flipRtl": false
-    }
-  ],
-  "inputsInline": true,
-  "nextStatement": null,
-  "colour": "%{BKY_EVENT_HUE}",
-  "tooltip": "Activates when the project starts running or is executed.",
-  "helpUrl": ""
-},{
   "type": "once",
-  "message0": "once %1",
+  "message0": "once %1 on %2 %3",
   "args0": [
     {
       "type": "input_value",
       "name": "EVENT",
       "check": "Boolean"
+    },
+    {
+      "type": "input_value",
+      "name": "CLIENT",
+      "check": "Client"
+    },
+    {
+      "type": "input_statement",
+      "name": "DO"
     }
   ],
   "inputsInline": true,
-  "nextStatement": null,
-  "colour": "%{BKY_EVENT_HUE}",
+  "colour": '%{BKY_EVENT_HUE}',
   "tooltip": "Executes only once when the specified condition becomes true.",
+  "helpUrl": ""
+},
+{
+  "type": "when",
+  "message0": "when %1 on %2 %3",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "EVENT",
+      "check": "Boolean"
+    },
+    {
+      "type": "input_value",
+      "name": "CLIENT",
+      "check": "Client"
+    },
+    {
+      "type": "input_statement",
+      "name": "DO"
+    }
+  ],
+  "inputsInline": true,
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Executes every time the specified condition is true.",
   "helpUrl": ""
 },
 {
@@ -70,7 +111,7 @@ Blockly.defineBlocksWithJsonArray([
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
       "options": [
         [
           "created",
@@ -127,42 +168,11 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "when",
-  "message0": "when %1",
-  "args0": [
-    {
-      "type": "input_value",
-      "name": "EVENT",
-      "check": "Boolean"
-    }
-  ],
-  "inputsInline": true,
-  "nextStatement": null,
-  "colour": '%{BKY_EVENT_HUE}',
-  "tooltip": "Executes every time the specified condition is true.",
-  "helpUrl": ""
-},{
   "type": "clientready",
   "message0": "Client is ready",
   "output": "Boolean",
-  "colour": "%{BKY_EVENT_HUE}",
+  "colour": '%{BKY_EVENT_HUE}',
   "tooltip": "Triggers when the Discord client is fully ready and connected to the server.",
-  "helpUrl": ""
-},
-{
-  "type": "output_event",
-  "message0": "ouputs of event  %1",
-  "args0": [
-    {
-      "type": "input_value",
-      "name": "EVENT",
-      "check": "Boolean"
-    }
-  ],
-  "inputsInline": true,
-  "output": "Array",
-  "colour": "%{BKY_INSTANCE_HUE}",
-  "tooltip": "Retrieves a list of outputs associated with a Event boolean condition. For example, if the boolean condition is <Channel deleted?>, the output will be an array of output(s), such as [Channel]. This can then be utilized further, such as by extracting specific properties like the name of the channel.",
   "helpUrl": ""
 },
 {
@@ -278,11 +288,28 @@ Blockly.defineBlocksWithJsonArray([
       "check": "String"
     }
   ],
+  "mutator" : 'send_message_mutator',
   "inputsInline": false,
   "previousStatement": null,
   "nextStatement": null,
   "colour": '%{BKY_ACTION_HUE}',
   "tooltip": "Sends a message to a specified Channel of a Guild.",
+  "helpUrl": ""
+},
+{
+  "type": "options_actions_container",
+  "message0": "options %1 %2",
+  "args0": [
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "input_statement",
+      "name": "NAME"
+    }
+  ],
+  "colour": '%{BKY_ACTION_HUE}',
+  "tooltip": "",
   "helpUrl": ""
 }
 ])
