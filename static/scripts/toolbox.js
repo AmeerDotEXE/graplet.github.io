@@ -49,19 +49,110 @@ var toolbox = {
             },
           },
           {
-            type: 'send_message',
+            type: 'change_guild_name',
+            kind: 'block',
+            inputs: {
+              NAME: {
+                shadow: {
+                  type: 'input',
+                  fields: {
+                    TEXT: "Wumpus club"
+                  }
+                }
+              }
+            }
+          },
+          {
+            type: 'message_action',
+            kind: 'block',
+            inputs: {
+              CONTENT: {
+                shadow: {
+                  type: 'input',
+                  fields: {
+                    TEXT: "Hi"
+                  }
+                }      
+              }
+            }
+          },
+          {
+            type: 'channel_action',
+            kind: 'block',
+            inputs: {
+              NAME: {
+                shadow: {
+                  type: 'input',
+                  fields: {
+                    TEXT: "Wumpus bathtub"
+                  }
+                }
+              }
+            }
+          },
+          {
+            type: 'role_action',
+            kind: 'block',
+            inputs: {
+              NAME: {
+                shadow: {
+                  type: 'input',
+                  fields: {
+                    TEXT: "Wumpus"
+                  }
+                }      
+              },
+              COLOUR: {
+                shadow: {
+                  type: 'colour_hsv_sliders'
+                }      
+              }
+            }
+          },
+          {
+            type: 'response_reply',
             kind: 'block',
             inputs : {
               CONTENT :{
                 shadow : {
                   type: 'input',
                   fields : {
-                    TEXT : 'Hello!'
+                    TEXT : "What's up?"
                   }
                 }
               }
             }
-          }
+          },
+          {
+            type: 'bulk_delete',
+            kind: 'block',
+            inputs : {
+              AMOUNT :{
+                shadow : {
+                  type: 'math_number',
+                  fields : {
+                    NUM: 4
+                  }
+                }
+              }
+            }
+          },
+          {
+            type: 'add_reaction',
+            kind: 'block',
+            inputs: {
+              REACTION: {
+                shadow: {
+                  type: 'input',
+                  fields: {
+                    TEXT: '👍'
+                  }
+                }
+              }
+            }
+          },
+
+          
         ]
       },
       {
@@ -285,32 +376,6 @@ var toolbox = {
             fields: {
               VAR: {
                 name: 'i',
-              },
-            },
-            inputs: {
-              FROM: {
-                shadow: {
-                  type: 'math_number',
-                  fields: {
-                    NUM: 1,
-                  },
-                },
-              },
-              TO: {
-                shadow: {
-                  type: 'math_number',
-                  fields: {
-                    NUM: 10,
-                  },
-                },
-              },
-              BY: {
-                shadow: {
-                  type: 'math_number',
-                  fields: {
-                    NUM: 1,
-                  },
-                },
               },
             },
           },

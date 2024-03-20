@@ -274,29 +274,63 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "send_message",
-  "message0": "send message in channel %1 Text content: %2 Optional Embed(s): %3",
+  "type": "add_reaction",
+  "message0": "to message %1 %2 reaction %3 %4 ",
   "args0": [
     {
       "type": "input_value",
-      "name": "CHANNEL",
-      "check": "Channel"
+      "name": "MESSAGE",
+      "check": "Message"
+    },
+    {
+      "type": "field_dropdown",
+      "name": "ACTION",
+      "options": [
+        [
+          "add",
+          "ADD"
+        ],
+        [
+          "remove",
+          "REMOVE"
+        ]
+      ]
+    },
+    {
+      "type": "input_dummy"
     },
     {
       "type": "input_value",
-      "name": "CONTENT",
+      "name": "REACTION",
       "check": "String"
     },
-    {
-      "type": "input_value",
-      "name": "EMBEDS"
-    }
   ],
-  "inputsInline": false,
+  "inputsInline": true,
   "previousStatement": null,
   "nextStatement": null,
   "colour": '%{BKY_ACTION_HUE}',
-  "tooltip": "Sends a message to a specified Channel of a Guild.",
+  "tooltip": "Removes or adds a reaction to a Message.",
+  "helpUrl": ""
+},
+{
+  "type": "change_guild_name",
+  "message0": "change name of guild %1 to %2",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "GUILD",
+      "check": "Guild"
+    },
+    {
+      "type": "input_value",
+      "name": "NAME"
+    }
+  ],
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": '%{BKY_ACTION_HUE}',
+  "tooltip": "Changes the name of a given Guild.",
   "helpUrl": ""
 },
 {
@@ -364,4 +398,208 @@ Blockly.defineBlocksWithJsonArray([
   "tooltip": "",
   "helpUrl": ""
 },
+{
+  "type": "response_reply",
+  "message0": "%1 %2 with %3",
+  "args0": [
+    {
+      "type": "field_label_serializable",
+      "name": "STATUS",
+      "text": "reply to message"
+    },
+    {
+      "type": "input_value",
+      "name": "MESSAGE",
+      "check": "Message"
+    },
+    {
+      "type": "input_value",
+      "name": "CONTENT"
+    }
+  ],
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": '%{BKY_ACTION_HUE}',
+  "tooltip": "Replies to a message.",
+  "helpUrl": ""
+},
+{
+  "type": "bulk_delete",
+  "message0": "in channel %1 purge %2 messages",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "CHANNEL",
+      "check": "Channel"
+    },
+    {
+      "type": "input_value",
+      "name": "AMOUNT",
+      "check": "Number"
+    }
+  ],
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": '%{BKY_ACTION_HUE}',
+  "tooltip": "Deletes a given amount of messages in a Channel.",
+  "helpUrl": ""
+},
 ])
+
+function generateActionBlock(typeLabel,initOptions, updateConnectionsFunction) {
+  return {
+    validate: function(newValue) {
+      this.getSourceBlock().updateConnections(newValue);
+      return newValue;
+    },
+    init: function() {
+      var options = initOptions;
+      this.setColour('%{BKY_ACTION_HUE}');
+      this.setNextStatement(true);
+      this.setPreviousStatement(true);
+      this.setInputsInline(true);
+      this.appendDummyInput()
+        .appendField(typeLabel)
+        .appendField(new Blockly.FieldDropdown(options, this.validate), 'TYPE');
+      this.updateConnections(initOptions[0][1]);
+    },
+    updateConnections: updateConnectionsFunction
+  };
+}
+
+var channelActions = generateActionBlock('channel',[
+  ['create', 'CREATE'],
+  ['edit', 'EDIT'],
+  ['delete', 'DELETE']
+], function(newValue) {
+  this.removeInput('CREATE', true);
+  this.removeInput('EDIT', true);
+  this.removeInput('DELETE', true);
+  this.removeInput('NAME', true);
+  this.removeInput('GUILD', true);
+  if (newValue == 'CREATE') {
+    this.appendDummyInput('CREATE')
+      .appendField('type:')
+      .appendField(new Blockly.FieldDropdown([['Text', 'TEXT'], ['Voice', 'VOICE'], ['Announcement', 'ANNOUNCEMENT'],['Stage', 'STAGE']]), 'CHANNELTYPE');
+    this.appendValueInput('GUILD')
+      .appendField('on guild:')
+      .setCheck('Guild')
+    parentBlock = this.appendValueInput('NAME')
+      .appendField('name:')
+    if (Workspace && !parentBlock.connection.targetConnection && !parentBlock.sourceBlock.isInFlyout){
+      var InputBlock = Workspace.newBlock('input')
+        InputBlock.setShadow(true)
+        InputBlock.initSvg()
+        InputBlock.render();
+      parentBlock.connection.connect(InputBlock.outputConnection)
+    }
+  } else if (newValue == 'EDIT') {
+    var InputBlock = Workspace.newBlock('input')
+      InputBlock.setShadow(true)
+      InputBlock.initSvg()
+      InputBlock.render();  
+    this.appendValueInput('EDIT')
+      .appendField('channel:')
+      .setCheck('Channel')
+    this.appendValueInput('NAME')
+      .appendField('new name:')
+      .connection.connect(InputBlock.outputConnection)   
+  } else if (newValue == 'DELETE') {
+    this.appendValueInput('DELETE')
+      .appendField('channel:')
+      .setCheck('Channel')
+  }
+});
+
+var messageActions = generateActionBlock('message',[
+  ['send', 'SEND'],
+  ['edit', 'EDIT'],
+  ['delete', 'DELETE']
+], function(newValue) {
+  this.removeInput('SEND',true);
+  this.removeInput('EDIT', true);
+  this.removeInput('DELETE',true);
+  this.removeInput('CONTENT',true);
+  if (newValue == 'SEND') {
+    this.appendValueInput('SEND')
+      .appendField('in channel:')
+      .setCheck('Channel')
+    var parentBlock = this.appendValueInput('CONTENT')
+      .appendField('content:')
+      .setCheck('String')
+    if (Workspace && !parentBlock.connection.targetConnection && !parentBlock.sourceBlock.isInFlyout){
+      var InputBlock = Workspace.newBlock('input')
+        InputBlock.setShadow(true)
+        InputBlock.initSvg()
+        InputBlock.render();
+      parentBlock.connection.connect(InputBlock.outputConnection)
+    }
+  } else if (newValue == 'EDIT') {
+    this.appendValueInput('EDIT')
+      .appendField('message:')
+      .setCheck('Message')
+    var InputBlock = Workspace.newBlock('input')
+      InputBlock.setShadow(true)
+      InputBlock.initSvg()
+      InputBlock.render();
+
+    this.appendValueInput('CONTENT')
+      .appendField('new content:')
+      .connection.connect(InputBlock.outputConnection)        
+  } else if (newValue == 'DELETE'){
+    this.appendValueInput('DELETE')
+    .appendField('message:')
+    .setCheck('Message')
+  }
+});
+
+var roleActions = generateActionBlock('role',[
+  ['create', 'CREATE'],
+  ['edit', 'EDIT'],
+  ['delete', 'DELETE']
+], function(newValue) {
+  this.removeInput('CREATE',true);
+  this.removeInput('EDIT', true);
+  this.removeInput('DELETE',true);
+  this.removeInput('NAME',true);
+  this.removeInput('COLOUR',true)
+  if (newValue == 'CREATE') {
+    this.appendValueInput('CREATE')
+      .appendField('in guild:')
+      .setCheck('Guild')
+    var parentBlock1 = this.appendValueInput('NAME')
+      .appendField('name:')
+      .setCheck('String')
+    var parentBlock2 = this.appendValueInput('COLOUR')
+      .appendField('color:')
+      .setCheck('Colour')
+    
+    if (Workspace){
+      if (!parentBlock1.connection.targetConnection && !parentBlock1.sourceBlock.isInFlyout){
+        var InputBlock = Workspace.newBlock('input')
+          InputBlock.setShadow(true)
+          InputBlock.initSvg()
+          InputBlock.render();
+        parentBlock1.connection.connect(InputBlock.outputConnection)
+      }
+    }
+  } else if (newValue == 'EDIT') {
+    this.appendValueInput('EDIT')
+      .appendField('role:')
+      .setCheck('Role')
+    var InputBlock = Workspace.newBlock('input')
+      InputBlock.setShadow(true)
+      InputBlock.initSvg()
+      InputBlock.render();  
+
+    this.appendValueInput('NAME')
+      .appendField('new name:')
+      .connection.connect(InputBlock.outputConnection)        
+  } else if (newValue == 'DELETE'){
+    this.appendValueInput('DELETE')
+    .appendField('role:')
+    .setCheck('Role')
+  }
+});

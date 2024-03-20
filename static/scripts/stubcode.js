@@ -11,7 +11,7 @@ javascript.javascriptGenerator.forBlock['input'] = function(block, generator) {
 
 javascript.javascriptGenerator.forBlock['colour_hsv_sliders'] = function (block,generator) {
   const code = generator.quote_(block.getFieldValue('COLOUR'));
-  return [code, Order.ATOMIC];
+  return [code, javascript.Order.ATOMIC];
 };
 
 javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
@@ -27,10 +27,74 @@ javascript.javascriptGenerator.forBlock['client_login'] = function(block, genera
   return code;
 };
 
-javascript.javascriptGenerator.forBlock['send_message'] = function(block, generator) {
-  //TODO: IMPLEMENT MUTATOR STUBCODE
-  return '\n';
+javascript.javascriptGenerator.forBlock['add_reaction'] = function(block, generator) {
+  var dropdown_action = block.getFieldValue('ACTION');
+  var value_reaction = generator.valueToCode(block, 'REACTION', javascript.Order.ATOMIC);
+  var value_message = generator.valueToCode(block, 'MESSAGE', javascript.Order.ATOMIC);
+  // TODO: Assemble javascript into code variable.
+  var code = '...\n';
+  return code;
 };
+
+javascript.javascriptGenerator.forBlock['response_reply'] = function(block, generator) {
+  var field_status = block.getFieldValue('STATUS');
+  var value_message = generator.valueToCode(block, 'MESSAGE', javascript.Order.ATOMIC);
+  var value_content = generator.valueToCode(block, 'CONTENT', javascript.Order.ATOMIC);
+  // TODO: Assemble javascript into code variable.
+  var code = '...\n';
+  return code;
+};
+
+javascript.javascriptGenerator.forBlock['bulk_delete'] = function(block, generator) {
+  var value_channel = generator.valueToCode(block, 'CHANNEL', javascript.Order.ATOMIC);
+  var value_amount = generator.valueToCode(block, 'AMOUNT', javascript.Order.ATOMIC);
+  // TODO: Assemble javascript into code variable.
+  var code = '...\n';
+  return code;
+};
+
+javascript.javascriptGenerator.forBlock['channel_action'] = function(block, generator) {
+  var dropdown_action = block.getFieldValue('ACTION');
+  // TODO: Assemble javascript into code variable.
+  var code = '...\n';
+  return code;
+};
+
+javascript.javascriptGenerator.forBlock['message_action'] = function(block, generator) {
+  var dropdown_action = block.getFieldValue('ACTION');
+  // TODO: Assemble javascript into code variable.
+  var code = '...\n';
+  return code;
+};
+
+javascript.javascriptGenerator.forBlock['role_action'] = function(block, generator) {
+  var dropdown_action = block.getFieldValue('ACTION');
+  // TODO: Assemble javascript into code variable.
+  var code = '...\n';
+  return code;
+};
+
+javascript.javascriptGenerator.forBlock['user_action'] = function(block, generator) {
+  var dropdown_action = block.getFieldValue('ACTION');
+  // TODO: Assemble javascript into code variable.
+  var code = '...\n';
+  return code;
+};
+
+javascript.javascriptGenerator.forBlock['change_guild_name'] = function(block, generator) {
+  var dropdown_action = block.getFieldValue('ACTION');
+  // TODO: Assemble javascript into code variable.
+  var code = '...\n';
+  return code;
+};
+
+javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator) {
+  var dropdown_instances = block.getFieldValue('INSTANCES');
+  // TODO: Assemble javascript into code variable.
+  var code = '...\n';
+  return code;
+};
+
 
 // EVENTS
 
@@ -91,7 +155,6 @@ javascript.javascriptGenerator.forBlock['property_of'] = function(block, generat
     return null
 }};
 
-
 javascript.javascriptGenerator.forBlock['client'] = function(block, generator) {
   // TODO: add mutators
   var code = 'new Client';
@@ -110,3 +173,4 @@ javascript.javascriptGenerator.forBlock['embed_builder'] = function(block, gener
   var code = '\n';
   return [code, javascript.Order.NONE];
 };
+

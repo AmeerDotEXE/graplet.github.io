@@ -20,7 +20,6 @@
 }
 
 .zelos-renderer.graplet-theme .blocklyHtmlInput::selection{
-  color: white;
   background: rgba(0, 0, 0, 0.2);
 }
 
@@ -97,7 +96,7 @@
 .zelos-renderer.graplet-theme.blocklyDropDownDiv .goog-menuitem-content{
   color: var(--default-text);
 }
-.blocklyEditableText image {
+.blocklyDraggable image{
   filter: brightness(calc(1 - var(--val)));
 }
 
@@ -123,6 +122,12 @@
 }
 
 #blockly-d{
-  background-color: transparent !important;
+  background-color: rgba(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)), 0.1) !important;
   padding: 0;
+  cursor: pointer;
+}
+
+
+#blockly-d:hover{
+  background-color: rgba(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)), 0.2) !important;
 }

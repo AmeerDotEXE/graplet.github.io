@@ -3,6 +3,8 @@ Blockly.Msg.EVENT_HUE = 20;
 Blockly.Msg.INSTANCE_HUE = 290;
 Blockly.utils.colour.setHsvSaturation(0.55); 
 Blockly.utils.colour.setHsvValue(0.78);  
+Blockly.FieldCheckbox.CHECK_CHAR = '✔'
+
 
 let HasChanges = false;
 
@@ -11,22 +13,29 @@ const graplet_theme = Blockly.Theme.defineTheme('graplet', {
   'startHats': true,
 });
 
+djsInstanceDict = {
+  'Client' : ['Guilds','User','Channels','Shard'],
 
-Blockly.Extensions.register('dynamic_property_of',
-  function() {
-    children = this.getChildren()
-    this.getInput('VALUE_CHILD')
-      .appendField(new Blockly.FieldDropdown(
-        function() {
-          var options = [['...', 'NONE']];
-          if (children[0] != undefined){
-            console.log(children[0]);
-          }
-          return options;
-        }), 'VALUE');
-  });
+}
+
+Blockly.Extensions.register('dynamic_property_of', function() {
+  this.getInput('VALUE_CHILD').appendField(new Blockly.FieldDropdown(function() {
+    var options = [['...', 'NONE']];
+    var child = this.getChildren()[0];
+    if (child && djsInstanceDict[child.outputConnection.check]) {
+      options = options.concat(djsInstanceDict[child.outputConnection.check].map(function(property) {
+        return [property,property.toUpperCase()];
+      }));
+    }
+    return options;
+  }.bind(this)), 'VALUE');
+});
 
 
+Blockly.Blocks['channel_action'] = channelActions
+Blockly.Blocks['message_action'] = messageActions
+Blockly.Blocks['role_action'] = roleActions
+  
 Blockly.Extensions.registerMutator(
   'embed_builder_mutator',embed_builder_method,undefined,[]);
 
@@ -52,6 +61,7 @@ var Workspace = Blockly.inject("blocklyDiv", {
   },
   trashcan: true 
 });
+
 console.info('Blockly injected.');
 
 const options = {
