@@ -1,4 +1,4 @@
-
+window.onload = function(){
 openDatabase()
   .then(db => {
     console.log("Database opened successfully on load theme.", db);
@@ -19,8 +19,7 @@ openDatabase()
   })
   .catch(error => {
     console.error("Error opening database:", error);
-});
-
+})};
 
 
 

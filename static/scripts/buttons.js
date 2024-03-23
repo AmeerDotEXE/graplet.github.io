@@ -129,11 +129,11 @@ function save() {
           const successSvg = document.getElementById('save-success');
           const labelSave = document.getElementById('save-label');
           labelSave.textContent = 'Created!';
-          successSvg.style.display = 'block';
+          successSvg.style.display = 'flex';
           defaultSvg.style.display = 'none';
           setTimeout(() => {
             successSvg.style.display = 'none';
-            defaultSvg.style.display = 'block';
+            defaultSvg.style.display = 'flex';
             labelSave.textContent = 'Save locally';
           }, "2000");
         };
@@ -191,18 +191,23 @@ function save() {
 
 
 
-function DownloadJS() {
-  var JSContent = document.getElementById('generated-code').value;
-  var blob = new Blob([JSContent], {
-    type: 'text/javascript'
-  });
-  var link = document.createElement('a');
-  link.href = window.URL.createObjectURL(blob);
-  link.download = 'bot.js';
+async function DownloadArchive() {
+  const JSContent = document.getElementById('generated-code').value;
+  const projectName = document.getElementById("projectName").value;
+
+
+  const zip = new JSZip();
+  zip.file("bot.js", JSContent);
+  const content = await zip.generateAsync({ type: "blob" });
+  const zipBlob = new Blob([content]);
+  const zipUrl = URL.createObjectURL(zipBlob);
+  const link = document.createElement("a");
+  link.href = zipUrl;
+  link.download = `${projectName}.zip`;
   link.click();
 }
 
-function CopyRawJS() {
+function CopyRaw() {
   var JSContent = document.getElementById('generated-code').value;
   copyElement = document.getElementById('copy-element');
   navigator.clipboard.writeText(JSContent)

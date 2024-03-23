@@ -102,7 +102,7 @@ javascript.javascriptGenerator.forBlock['once'] = function(block, generator) {
   const client = generator.valueToCode(block, 'CLIENT', javascript.Order.ATOMIC);
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `${client}.once(${value_event}=>{\n${innerCode}\n});`;
+  var code = `${client}.once(${value_event}, async() => {\n${innerCode}\n});`;
   return code;
 };
 
