@@ -1,7 +1,7 @@
 function resizeTabelements(){
   var tabelements = document.getElementsByClassName("tabelement");
   Array.from(tabelements).forEach(function (element) {
-      element.style.height = window.innerHeight - 120 + 'px';
+      element.style.height = window.innerHeight - 116 + 'px';
   });
 }
 resizeTabelements();

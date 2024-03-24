@@ -15,7 +15,7 @@ function openDatabase() {
 
     connection.onupgradeneeded = function(event) {
       const db = event.target.result;
-      const ProjectStore = db.createObjectStore("projects", { autoIncrement: true });
+      const ProjectStore = db.createObjectStore("projects", {keyPath: 'id', autoIncrement: true });
       const SettingsStore = db.createObjectStore("settings");
       ProjectStore.createIndex("name", "name", { unique: true });
       SettingsStore.createIndex("theme","theme")

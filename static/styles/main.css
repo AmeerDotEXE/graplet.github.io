@@ -56,7 +56,11 @@ body {
 }
 
 .navigator:hover {
-    background-color: rgba(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)), 0.1);
+  background-color: rgba(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)), 0.1);
+}
+
+.navigator:active{
+  background-color: rgba(calc(225 - var(--val)), calc(225 - var(--val)), calc(225 - var(--val)), 0.3);
 }
 
 .home:hover {
@@ -105,6 +109,9 @@ button {
 button:hover {
     box-shadow: 0 0 20px rgba(calc(225 - var(--val)),calc(225 - var(--val)),calc(225 - var(--val)), 0.2);
 }
+button:active {
+  box-shadow: 0 0 30px rgba(calc(225 - var(--val)),calc(225 - var(--val)),calc(225 - var(--val)), 0.2);
+}
 .button h2{
     margin: 0;
 }
@@ -114,7 +121,7 @@ button:hover {
 
 a{
     text-decoration: none;
-    color: rgb(170, 82, 82);
+    color: #aa5252;
     cursor: pointer;
 }
 

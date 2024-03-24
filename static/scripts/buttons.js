@@ -114,7 +114,6 @@ function save() {
         }
         const project = {
           name: projectName,
-          image: null,
           blocks: JSON.stringify(Blockly.serialization.workspaces.save(Workspace), null, 2)
         };
 
@@ -161,7 +160,7 @@ function save() {
           data.blocks = JSON.stringify(Blockly.serialization.workspaces.save(Workspace), null, 2);
           data.name = projectName;
           
-          const requestUpdate = objectStore.put(data,parseInt(ProjectIDRoot));
+          const requestUpdate = objectStore.put(data);
           requestUpdate.onerror = (event) => {
             alert("There was an error updating Database.");
             console.error(event);
@@ -172,11 +171,11 @@ function save() {
             const successSvg = document.getElementById('save-success');
             const labelSave = document.getElementById('save-label');
             labelSave.textContent = 'Saved!';
-            successSvg.style.display = 'block';
+            successSvg.style.display = 'flex';
             defaultSvg.style.display = 'none';
             setTimeout(() => {
               successSvg.style.display = 'none';
-              defaultSvg.style.display = 'block';
+              defaultSvg.style.display = 'flex';
               labelSave.textContent = 'Save locally';
             }, "2000");
           };
@@ -192,12 +191,13 @@ function save() {
 
 
 async function DownloadArchive() {
-  const JSContent = document.getElementById('generated-code').value;
+  const code = document.getElementById('generated-code').value;
   const projectName = document.getElementById("projectName").value;
 
-
   const zip = new JSZip();
-  zip.file("bot.js", JSContent);
+  const e = document.getElementById('code-lang');
+  var value = e.options[e.selectedIndex].value;
+  zip.file(`bot.${value}`, code);
   const content = await zip.generateAsync({ type: "blob" });
   const zipBlob = new Blob([content]);
   const zipUrl = URL.createObjectURL(zipBlob);
@@ -225,4 +225,86 @@ function CopyRaw() {
         copyElement.textContent = 'Copy raw ';
       }, 1000);
     });
+}
+
+function saveUrlImg(imgUrl) {
+  var ProjectID = window.location.hash.substring(1);
+
+  if (ProjectID != ProjectIDRoot) {
+    alert('The current ProjectID hash does not correspond to the root ID.');
+    return;
+  } else if (ProjectID === "") {
+    alert('You must save the project first before updating the project image.');
+    return;
+  }
+
+  if (/\.(jpeg|jpg|gif|png|bmp|svg)$/i.test(imgUrl)) {
+    openDatabase()
+      .then(db => {
+        const objectStore = db.transaction(["projects"], "readwrite").objectStore("projects");
+        const request = objectStore.get(parseInt(ProjectIDRoot));
+
+        request.onerror = (event) => {
+          alert("There was an error retrieving the existing Database.");
+          console.error(event);
+        };
+
+        request.onsuccess = (event) => {
+          const data = event.target.result;
+          data.image = imgUrl;
+
+          const requestUpdate = objectStore.put(data);
+
+          requestUpdate.onerror = (event) => {
+            alert("There was an error updating Database.");
+            console.error(event);
+          };
+
+          requestUpdate.onsuccess = (event) => {
+            const projectIcon = document.getElementById('project-icon');
+            projectIcon.src = imgUrl;
+            const labelSave = document.getElementById('save-img');
+            labelSave.textContent = 'Saved!';
+            setTimeout(() => {
+              labelSave.textContent = 'Save';
+            }, 2000);
+          };
+        };
+      })
+      .catch(error => {
+        console.error("Error opening database:", error);
+      });
+  } else {
+    alert('Invalid image URL.\nThe URL must end with .jpeg, .jpg, .gif, .png, .bmp, or .svg.');
+  }
+}
+
+
+function deleteProject(){
+  var ProjectID = window.location.hash.substring(1);
+  if (ProjectID != ProjectIDRoot) {
+    alert('The current ProjectID hash does not correspond to the root ID.');
+    return;
+  } else if (ProjectID === "") {
+    alert('No project has been created yet. Leaving will abandon your unsaved project.');
+    return;
+  }
+  var confirmation = window.confirm('You are about to delete a project. This action is irreversible.');
+  if (confirmation){
+    openDatabase()
+    .then(db => {
+      const objectStore = db.transaction(["projects"], "readwrite").objectStore("projects");
+      const request = objectStore.delete(parseInt(ProjectIDRoot));
+      request.onsuccess = (event) =>{
+        window.location.href = 'projects.html'; 
+      }
+      request.onerror = (event) => {
+        alert("There was an error deleting the project.");
+        console.error(event);
+      };
+    })
+    .catch(error => {
+      console.error("Error opening database:", error);
+    });
+  }
 }

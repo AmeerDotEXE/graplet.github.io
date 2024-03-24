@@ -93,8 +93,11 @@ if (ProjectIDRoot != '') {
       const Project = event.target.result;
       PayloadBlocks = JSON.parse(Project.blocks);
       Blockly.serialization.workspaces.load(PayloadBlocks, Workspace);
-      const projectName = document.getElementById('projectName');
-      projectName.value = Project.name
+      document.getElementById('projectName').value = Project.name;
+      document.getElementById('img-input').value = Project.image;
+      if (Project.image){
+        document.getElementById('project-icon').src = Project.image;
+      }
       // Add image load later ( still null for now )
       console.info("Loaded!");
     };
@@ -141,15 +144,31 @@ const supportedEvents = new Set([
   Blockly.Events.BLOCK_MOVE,
 ]);
 
-function updateCode(event) {
+function codeUpdateListener(event) {
   if (Workspace.isDragging()) return; // Don't update while changes are happening.
   if (!supportedEvents.has(event.type)) return;
-
-  const code = javascript.javascriptGenerator.workspaceToCode(Workspace);
+  const e = document.getElementById('code-lang');
+  var value = e.options[e.selectedIndex].value;
   HasChanges = true;
-  document.getElementById('generated-code').textContent =  `const { Client, Events, GatewayIntentBits } = require('discord.js');\n${code}`;
-}
-Workspace.addChangeListener(updateCode);
+  updateCode(value);
+ }
+
+
+function updateCode(lang){
+  HasChanges = true;
+  const output = document.getElementById('generated-code')
+  if (lang == 'js'){
+    document.getElementById('dependecy-text').innerHTML = 'Install the JavaScript <a href="https://nodejs.org/en">Node.js</a> Runtime';
+    const code = javascript.javascriptGenerator.workspaceToCode(Workspace);
+    output.textContent =  `// Javascript\nconst { Client, Events, GatewayIntentBits } = require('discord.js');\n${code}`;
+  } else if (lang == 'py'){
+    document.getElementById('dependecy-text').innerHTML = 'Install the lastest version of <a href="https://python.org/downloads">Python</a>';
+    const code = python.pythonGenerator.workspaceToCode(Workspace);
+    output.textContent = `# Python\nimport discord\n${code}`
+  }
+} 
+
+Workspace.addChangeListener(codeUpdateListener);
 
 Workspace.addChangeListener(event => {
   if (event.type === Blockly.Events.FINISHED_LOADING) {
@@ -167,3 +186,7 @@ window.addEventListener("beforeunload", function(event) {
     }
   }
 });
+
+function SwitchLanguage(lang){
+  updateCode(lang)
+}
