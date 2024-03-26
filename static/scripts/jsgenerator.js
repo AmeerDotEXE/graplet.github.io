@@ -157,7 +157,7 @@ javascript.javascriptGenerator.forBlock['property_of'] = function(block, generat
 
 javascript.javascriptGenerator.forBlock['client'] = function(block, generator) {
   // TODO: add mutators
-  var code = 'new Client';
+  var code = 'new Client({ intents: [GatewayIntentBits.Guilds]})';
   return [code, javascript.Order.NONE];
 };
 

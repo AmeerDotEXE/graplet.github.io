@@ -374,7 +374,7 @@ Blockly.defineBlocksWithJsonArray([
     },
     {
       "type": "field_checkbox",
-      "name": "COLOR",
+      "name": "COLOUR",
       "checked": false
     },
     {
@@ -488,7 +488,7 @@ var channelActions = generateActionBlock('channel',[
       .setCheck('Guild')
     parentBlock = this.appendValueInput('NAME')
       .appendField('name:')
-    if (Workspace && !parentBlock.connection.targetConnection && !parentBlock.sourceBlock.isInFlyout){
+    if (this.rendered && Workspace && !parentBlock.connection.targetConnection && !parentBlock.sourceBlock.isInFlyout){
       var InputBlock = Workspace.newBlock('input')
         InputBlock.setShadow(true)
         InputBlock.initSvg()
@@ -529,7 +529,7 @@ var messageActions = generateActionBlock('message',[
     var parentBlock = this.appendValueInput('CONTENT')
       .appendField('content:')
       .setCheck('String')
-    if (Workspace && !parentBlock.connection.targetConnection && !parentBlock.sourceBlock.isInFlyout){
+    if (this.rendered && Workspace && !parentBlock.connection.targetConnection && !parentBlock.sourceBlock.isInFlyout){
       var InputBlock = Workspace.newBlock('input')
         InputBlock.setShadow(true)
         InputBlock.initSvg()
@@ -577,7 +577,7 @@ var roleActions = generateActionBlock('role',[
       .setCheck('Colour')
     
     if (Workspace){
-      if (!parentBlock1.connection.targetConnection && !parentBlock1.sourceBlock.isInFlyout){
+      if (this.rendered && !parentBlock1.connection.targetConnection && !parentBlock1.sourceBlock.isInFlyout){
         var InputBlock = Workspace.newBlock('input')
           InputBlock.setShadow(true)
           InputBlock.initSvg()

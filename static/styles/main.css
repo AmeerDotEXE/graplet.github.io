@@ -147,7 +147,7 @@ input[type="text"] {
 }
 code{
     background-color: rgba(var(--val), var(--val), var(--val), 0.2);
-    padding: 5px;
+    padding: 3px;
     border-radius: 5px;
 }
 li{

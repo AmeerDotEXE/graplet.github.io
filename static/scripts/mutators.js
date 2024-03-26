@@ -1,3 +1,9 @@
+const embedCheckboxes = ['DESCRIPTION','TITLE','COLOUR','AUTHOR','FOOTER'];
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 embed_builder_method =   {
   saveExtraState: function() {
     return {
@@ -16,12 +22,21 @@ embed_builder_method =   {
   },
   
   compose: function(topBlock) {
-    // TODO : check for checked and then add items
     this.embedOptions = []
+    for (let i = 0; i < embedCheckboxes.length; i++) {
+      this.embedOptions.push(topBlock.getFieldValue(embedCheckboxes[i]))
+    }
     this.updateShape();
   },
   updateShape: function() {
-    // TODO: add value inputs based on list
-    console.log(this.embedOptions)
+    if (this.embedOptions){
+      for (let i=0; i < this.embedOptions.length; i++){
+        if (this.embedOptions[i] == 'TRUE'){
+          value = embedCheckboxes[i]
+          this.appendValueInput(value)
+            .appendField(`${capitalizeFirstLetter(value.toLowerCase())}:`)
+        }
+      }
+    }
   }
 }

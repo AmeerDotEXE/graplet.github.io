@@ -158,11 +158,13 @@ function updateCode(lang){
   HasChanges = true;
   const output = document.getElementById('generated-code')
   if (lang == 'js'){
-    document.getElementById('dependecy-text').innerHTML = 'Install the JavaScript <a href="https://nodejs.org/en">Node.js</a> Runtime';
+    document.getElementById('dependecy-text').innerHTML = 'Ensure you have <a href="https://nodejs.org/en">Node.js</a> installed.';
+    document.getElementById('dependecy-run').innerHTML = '<li>type <code>npm install discord.js</code> to install the necessary packages</li>\n<li>Finally, run the bot using <code>node bot.js</code></li>';
     const code = javascript.javascriptGenerator.workspaceToCode(Workspace);
     output.textContent =  `// Javascript\nconst { Client, Events, GatewayIntentBits } = require('discord.js');\n${code}`;
   } else if (lang == 'py'){
-    document.getElementById('dependecy-text').innerHTML = 'Install the lastest version of <a href="https://python.org/downloads">Python</a>';
+    document.getElementById('dependecy-text').innerHTML = 'Ensure you have <a href="https://python.org/downloads">Python</a> installed.';
+    document.getElementById('dependecy-run').innerHTML = '<li>type <code>pip install discord.py</code> to install the necessary modules</li>\n<li>Finally, run the bot using <code>python bot.py</code></li>';
     const code = python.pythonGenerator.workspaceToCode(Workspace);
     output.textContent = `# Python\nimport discord\n${code}`
   }
