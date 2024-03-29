@@ -16,13 +16,13 @@ javascript.javascriptGenerator.forBlock['colour_hsv_sliders'] = function (block,
 
 javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
   const LOG = generator.valueToCode(block, 'LOG', javascript.Order.NONE);
-  return `console.log(${LOG});`};
+  return `console.log(${LOG});\n`};
   
 // ACTIONS
   
 javascript.javascriptGenerator.forBlock['bot_login'] = function(block, generator) {
   var token = generator.valueToCode(block, 'TOKEN_INPUT', javascript.Order.NONE);
-  var code = `client.login(${token});`;
+  var code = `client.login(${token});\n`;
   return code;
 };
 
@@ -81,22 +81,23 @@ javascript.javascriptGenerator.forBlock['user_action'] = function(block, generat
 };
 
 javascript.javascriptGenerator.forBlock['change_guild_name'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+  var value_guild = generator.valueToCode(block, 'GUILD', javascript.Order.NONE);
+  var value_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+
+  var code = `await ${value_guild}.setName(${value_name});\n`;
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator) {
   var dropdown_instances = block.getFieldValue('INSTANCES');
-  var id_input = generator.valueToCode(block, 'ID_INPUT', python.Order.NONE);
+  var id_input = generator.valueToCode(block, 'ID_INPUT', javascript.Order.NONE);
 
   var code = 'null';
 
   //TYPE ${dropdown_instances}
   //GUILD,CHANNEL,USER,EMOJI,MEMBER,ROLE
   if (['MEMBER', 'ROLE'].includes(dropdown_instances)) {
-    method = generator.valueToCode(block, 'METHOD', python.Order.NONE);
+    method = generator.valueToCode(block, 'METHOD', javascript.Order.NONE);
     code = `(await ${method}.${dropdown_instances.toLowerCase()}s.fetch("${id_input}"))`;
   } else if (dropdown_instances == "EMOJI") {
     code = `client.${dropdown_instances.toLowerCase()}s.resolve("${id_input}")`;
@@ -105,7 +106,7 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
     code = `(await client.${dropdown_instances.toLowerCase()}s.fetch("${id_input}"))`;
   }
 
-  return [code, python.Order.NONE];
+  return [code, javascript.Order.NONE];
 };
 
 
@@ -114,14 +115,14 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
 javascript.javascriptGenerator.forBlock['once'] = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `client.once(${value_event}, async() => {\n${innerCode}\n});`;
+  var code = `client.once(${value_event}, async() => {\n${innerCode}\n});\n`;
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['when'] = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `client.on(${value_event}, output => {\n${innerCode}\n});`;
+  var code = `client.on(${value_event}, async(output) => {\n${innerCode}\n});\n`;
   return code;
 };
 
