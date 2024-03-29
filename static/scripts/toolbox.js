@@ -11,19 +11,9 @@ var toolbox = {
             text: 'Actions'
           },
           {
-            type : 'client_login',
+            type : 'bot_login',
             kind : 'block',
             inputs: {
-              LOGIN_INPUT: {
-                block: {
-                  type: 'variables_get',
-                  fields: {
-                    VAR: {
-                      name: 'client',
-                    },
-                  },
-                }
-              },
               TOKEN_INPUT: {
                 shadow: {
                   type: 'token_input'
@@ -35,16 +25,6 @@ var toolbox = {
             type : "get_by_id",
             kind : "block",
             inputs: {
-              CLIENT : {
-                block: {
-                  type: 'variables_get',
-                  fields: {
-                    VAR: {
-                      name: 'client',
-                    },
-                  },
-                }
-              },
               ID_INPUT : {
                 shadow: {
                   type: 'math_number',
@@ -174,41 +154,17 @@ var toolbox = {
           {
             type: 'once',
             kind: 'block',
-            inputs : {
-              CLIENT : {
-                block: {
-                  type: 'variables_get',
-                  fields: {
-                    VAR: {
-                      name: 'client',
-                    },
-                  },
-                }
-              },
-            }
           },
           {
             type: 'when',
             kind: 'block',
-            inputs : {
-              CLIENT : {
-                block: {
-                  type: 'variables_get',
-                  fields: {
-                    VAR: {
-                      name: 'client',
-                    },
-                  },
-                }
-              },
-            }
           },
           {
             kind: 'label',
             text: 'Event Bools'
           },
           {
-            'type': 'clientready',
+            'type': 'botready',
             'kind': 'block',
           },
           {
@@ -241,10 +197,6 @@ var toolbox = {
           },
           {
             'type': 'property_of',
-            'kind': 'block',
-          },
-          {
-            'type': 'client',
             'kind': 'block',
           },
           {

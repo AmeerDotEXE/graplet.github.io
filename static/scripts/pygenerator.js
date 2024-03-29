@@ -20,10 +20,9 @@ python.pythonGenerator.forBlock['console_log'] = function(block, generator) {
   
 // ACTIONS
   
-python.pythonGenerator.forBlock['client_login'] = function(block, generator) {
-  var login = generator.valueToCode(block, 'LOGIN_INPUT', javascript.Order.ATOMIC);
+python.pythonGenerator.forBlock['bot_login'] = function(block, generator) {
   var token = generator.valueToCode(block, 'TOKEN_INPUT', javascript.Order.NONE);
-  var code = `${login}.run(${token})`;
+  var code = `client.run(${token})`;
   return code;
 };
 
@@ -89,14 +88,13 @@ python.pythonGenerator.forBlock['change_guild_name'] = function(block, generator
 };
 
 python.pythonGenerator.forBlock['get_by_id'] = function(block, generator) {
-  var client = generator.valueToCode(block, 'CLIENT', python.Order.NONE); // TODO: If block is in a statement block with already client defined, use that client. ( also edit this on block )
   var instance = block.getFieldValue('INSTANCES');
   var id_input = generator.valueToCode(block, 'ID_INPUT', python.Order.NONE);
   if (['MEMBER', 'ROLE'].includes(instance)) {
     method = generator.valueToCode(block, 'METHOD', python.Order.NONE);
     var code = `${method}.get_${instance.toLowerCase()}(${id_input})`;
   }else{
-    var code = `${client}.get_${instance.toLowerCase()}(${id_input})`;
+    var code = `client.get_${instance.toLowerCase()}(${id_input})`;
   }
   return [code, python.Order.NONE];
 };
@@ -105,18 +103,16 @@ python.pythonGenerator.forBlock['get_by_id'] = function(block, generator) {
 // EVENTS
 
 python.pythonGenerator.forBlock['once'] = function(block, generator) {
-  const client = generator.valueToCode(block, 'CLIENT', python.Order.ATOMIC);
   const value_event = generator.valueToCode(block, 'EVENT', python.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `@${client}.event\nasync def ${value_event}\n${innerCode}\n`;
+  var code = `@client.event\nasync def ${value_event}\n${innerCode}\n`;
   return code;
 };
 
 python.pythonGenerator.forBlock['when'] = function(block, generator) {
-  const client = generator.valueToCode(block, 'CLIENT', python.Order.ATOMIC);
   const value_event = generator.valueToCode(block, 'EVENT', python.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `@${client}.event\nasync def ${value_event}\n${innerCode}\n`;
+  var code = `@client.event\nasync def ${value_event}\n${innerCode}\n`;
   return code;
 };
 
@@ -140,7 +136,7 @@ python.pythonGenerator.forBlock['emoji_event'] = function(block, generator) {
   return [code, python.Order.NONE];
 };
 
-python.pythonGenerator.forBlock['clientready'] = function(block, generator) {
+python.pythonGenerator.forBlock['botready'] = function(block, generator) {
   var code = 'on_ready():';
   return [code, python.Order.NONE];
 };
@@ -160,12 +156,6 @@ python.pythonGenerator.forBlock['property_of'] = function(block, generator) {
   }else{
     return null
 }};
-
-python.pythonGenerator.forBlock['client'] = function(block, generator) {
-  // TODO: add mutators
-  var code = 'discord.Client(intents=discord.Intents.all())';
-  return [code, python.Order.NONE];
-};
 
 python.pythonGenerator.forBlock['field_date'] = function(block, generator) {
   var time = block.getFieldValue('FIELDNAME');

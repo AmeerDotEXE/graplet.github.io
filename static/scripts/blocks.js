@@ -59,17 +59,12 @@ Blockly.defineBlocksWithJsonArray([
 },  
 {
   "type": "once",
-  "message0": "once %1 on %2 %3",
+  "message0": "once %1 %2",
   "args0": [
     {
       "type": "input_value",
       "name": "EVENT",
       "check": "Boolean"
-    },
-    {
-      "type": "input_value",
-      "name": "CLIENT",
-      "check": "Client"
     },
     {
       "type": "input_statement",
@@ -83,17 +78,12 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "when",
-  "message0": "when %1 on %2 %3",
+  "message0": "when %1 %2",
   "args0": [
     {
       "type": "input_value",
       "name": "EVENT",
       "check": "Boolean"
-    },
-    {
-      "type": "input_value",
-      "name": "CLIENT",
-      "check": "Client"
     },
     {
       "type": "input_statement",
@@ -168,19 +158,11 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "clientready",
-  "message0": "Client is ready",
+  "type": "botready",
+  "message0": "bot is ready",
   "output": "Boolean",
   "colour": '%{BKY_EVENT_HUE}',
-  "tooltip": "Triggers when the Discord client is fully ready and connected to the server.",
-  "helpUrl": ""
-},{
-  "type": "client",
-  "message0": "create new Client ",
-  "inputsInline": true,
-  "output": "Client",
-  "colour": "%{BKY_INSTANCE_HUE}",
-  "tooltip": "Initiates a new instance of a Discord client.",
+  "tooltip": "Triggers when the Discord bot is fully ready and connected to the server.",
   "helpUrl": ""
 },
 {
@@ -461,8 +443,6 @@ Blockly.Blocks['get_by_id'] = {
     this.setColour('%{BKY_ACTION_HUE}')
     this.setOutput(true, null);
     var options = [["guild","GUILD"],["channel","CHANNEL"],["user","USER"],["emoji","EMOJI"],["member","MEMBER"],["role","ROLE"]]; 
-    this.appendValueInput('CLIENT')
-      .appendField('with')
     this.appendDummyInput()
       .appendField('get')
       .appendField(new Blockly.FieldDropdown(options,this.validate), 'INSTANCES')
@@ -493,18 +473,11 @@ Blockly.Blocks['get_by_id'] = {
 
 
 
-Blockly.Blocks['client_login'] = {
+Blockly.Blocks['bot_login'] = {
   init: function() {
     this.jsonInit({
-      "type": "client_login",
-      "message0": "login %1 with token",
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "LOGIN_INPUT",
-          "check": "Client"
-        }
-      ],
+      "type": "bot_login",
+      "message0": "login with token",
       "inputsInline": true,
       "colour": "%{BKY_ACTION_HUE}",
       "tooltip": "Login the specified Client with the provided token.",

@@ -20,10 +20,9 @@ javascript.javascriptGenerator.forBlock['console_log'] = function(block, generat
   
 // ACTIONS
   
-javascript.javascriptGenerator.forBlock['client_login'] = function(block, generator) {
-  var login = generator.valueToCode(block, 'LOGIN_INPUT', javascript.Order.ATOMIC);
+javascript.javascriptGenerator.forBlock['bot_login'] = function(block, generator) {
   var token = generator.valueToCode(block, 'TOKEN_INPUT', javascript.Order.NONE);
-  var code = `${login}.login(${token});`;
+  var code = `client.login(${token});`;
   return code;
 };
 
@@ -99,24 +98,22 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
 // EVENTS
 
 javascript.javascriptGenerator.forBlock['once'] = function(block, generator) {
-  const client = generator.valueToCode(block, 'CLIENT', javascript.Order.ATOMIC);
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `${client}.once(${value_event}, async() => {\n${innerCode}\n});`;
+  var code = `client.once(${value_event}, async() => {\n${innerCode}\n});`;
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['when'] = function(block, generator) {
-  const client = generator.valueToCode(block, 'CLIENT', javascript.Order.ATOMIC);
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `${client}.on(${value_event}, output => {\n${innerCode}\n});`;
+  var code = `client.on(${value_event}, output => {\n${innerCode}\n});`;
   return code;
 };
 
 // EVENT BOOLS
 
-javascript.javascriptGenerator.forBlock['clientready'] = function(block, generator) {
+javascript.javascriptGenerator.forBlock['botready'] = function(block, generator) {
   var code = 'Events.ClientReady';
   return [code, javascript.Order.NONE];
 };
@@ -172,12 +169,6 @@ javascript.javascriptGenerator.forBlock['property_of'] = function(block, generat
   }else{
     return null
 }};
-
-javascript.javascriptGenerator.forBlock['client'] = function(block, generator) {
-  // TODO: add mutators
-  var code = 'new Client({ intents: [GatewayIntentBits.Guilds]})';
-  return [code, javascript.Order.NONE];
-};
 
 javascript.javascriptGenerator.forBlock['field_date'] = function(block, generator) {
   var time = block.getFieldValue('FIELDNAME');
