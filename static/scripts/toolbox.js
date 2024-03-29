@@ -24,25 +24,32 @@ var toolbox = {
                   },
                 }
               },
-              TOKEN_INPUT : {
+              TOKEN_INPUT: {
                 shadow: {
-                  type: 'input',
-                  fields: {
-                    TEXT: 'Your token here',
-                  },
+                  type: 'token_input'
                 }
-              }
+              },
             }
           },
           {
             type : "get_by_id",
             kind : "block",
             inputs: {
+              CLIENT : {
+                block: {
+                  type: 'variables_get',
+                  fields: {
+                    VAR: {
+                      name: 'client',
+                    },
+                  },
+                }
+              },
               ID_INPUT : {
                 shadow: {
                   type: 'math_number',
                   fields: {
-                    NUM: 1,
+                    NUM: 69420,
                   },
                 },
               },
@@ -212,7 +219,14 @@ var toolbox = {
             'type': 'emoji_event',
             'kind': 'block',
           },
-
+          {
+            'type': 'message_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'message_reaction_event',
+            'kind': 'block',
+          },
 
         ]
       },
@@ -240,16 +254,9 @@ var toolbox = {
           {
             type: 'embed_builder',
             kind: 'block',
-            inputs: {
-              DESCRIPTION: {
-                shadow: {
-                  type: 'input',
-                  fields: {
-                    TEXT: '' 
-                  }
-                }
-              }
-            }
+            extraState :{
+              "embedOptions" : ['DESCRIPTION'],
+            },
           }
         ]
       },
@@ -641,6 +648,14 @@ var toolbox = {
           {
             type: 'text_join',
             kind: 'block',
+            inputs :{
+              ADD0 :{
+                type: 'input'
+              },
+              ADD1 : {
+                type: 'input'
+              }
+            }
           },
           {
             type: 'text_append',

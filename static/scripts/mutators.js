@@ -17,6 +17,9 @@ embed_builder_method =   {
   },
   decompose: function(workspace) {
     var topBlock = workspace.newBlock('instances_options_embed_mutator');
+    for (let i= 0; i < this.embedOptions.length; i++){
+      topBlock.setFieldValue(true,this.embedOptions[i])
+    }
     topBlock.initSvg();
     return topBlock;
   },
@@ -24,18 +27,27 @@ embed_builder_method =   {
   compose: function(topBlock) {
     this.embedOptions = []
     for (let i = 0; i < embedCheckboxes.length; i++) {
-      this.embedOptions.push(topBlock.getFieldValue(embedCheckboxes[i]))
+      if (topBlock.getFieldValue(embedCheckboxes[i]) == 'TRUE'){
+        this.embedOptions.push(embedCheckboxes[i])
+      }
     }
     this.updateShape();
   },
   updateShape: function() {
-    if (this.embedOptions){
-      for (let i=0; i < this.embedOptions.length; i++){
-        if (this.embedOptions[i] == 'TRUE'){
-          value = embedCheckboxes[i]
-          this.appendValueInput(value)
-            .appendField(`${capitalizeFirstLetter(value.toLowerCase())}:`)
-        }
+    console.log(this.embedOptions)
+    for (let i = 0; i < embedCheckboxes.length; i++) {
+      this.removeInput(embedCheckboxes[i],true);
+    }
+    for (let i = 0; i < this.embedOptions.length; i++){
+      option = this.embedOptions[i];
+      parent = this.appendValueInput(option)
+        .appendField(capitalizeFirstLetter(`${option.toLowerCase()}:`))
+      if (Workspace && !parent.connection.targetConnection && !parent.sourceBlock.isInFlyout){
+        var InputBlock = Workspace.newBlock('input')
+          InputBlock.setShadow(true)
+          InputBlock.initSvg()
+          InputBlock.render();
+        parent.connection.connect(InputBlock.outputConnection)
       }
     }
   }

@@ -174,26 +174,6 @@ Blockly.defineBlocksWithJsonArray([
   "colour": '%{BKY_EVENT_HUE}',
   "tooltip": "Triggers when the Discord client is fully ready and connected to the server.",
   "helpUrl": ""
-},
-{
-  "type": "client_login",
-  "message0": "login %1 with token %2",
-  "args0": [
-    {
-      "type": "input_value",
-      "name": "LOGIN_INPUT",
-      "check": "Client"
-    },
-    {
-      "type": "input_value",
-      "name": "TOKEN_INPUT",
-      "check": "String"
-    }
-  ],
-  "inputsInline": true,
-  "colour": "%{BKY_ACTION_HUE}",
-  "tooltip": "Login the specified Client with the provided token.",
-  "helpUrl": ""
 },{
   "type": "client",
   "message0": "create new Client ",
@@ -221,56 +201,6 @@ Blockly.defineBlocksWithJsonArray([
   "output": null,
   "colour": '%{BKY_INSTANCE_HUE}',
   "tooltip": " Retrieves a specific property of an object or variable",
-  "helpUrl": ""
-},
-{
-  "type": "get_by_id",
-  "message0": "get instance %1 %2 %3 %4",
-  "args0": [
-    {
-      "type": "field_dropdown",
-      "name": "INSTANCES",
-      "options": [
-        [
-          "guild",
-          "GUILD"
-        ],
-        [
-          "channel",
-          "CHANNEL"
-        ],
-        [
-          "user",
-          "USER"
-        ],
-        [
-          "emoji",
-          "EMOJI"
-        ],
-        [
-          "invite",
-          "INVITE"
-        ]
-      ]
-    },
-    {
-      "type": "field_label_serializable",
-      "name": "BY",
-      "text": "by ID"
-    },
-    {
-      "type": "input_dummy"
-    },
-    {
-      "type": "input_value",
-      "name": "ID_INPUT",
-      "check": "Number"
-    }
-  ],
-  "inputsInline": true,
-  "output": null,
-  "colour": '%{BKY_ACTION_HUE}',
-  "tooltip": "Retrieves an instance or object by its unique identifier (ID)",
   "helpUrl": ""
 },
 {
@@ -335,15 +265,11 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "embed_builder",
-  "message0": "Embed Builder %1 Description %2",
+  "message0": "Embed Builder %1",
   "args0": [
     {
       "type": "input_dummy"
     },
-    {
-      "type": "input_value",
-      "name": "DESCRIPTION"
-    }
   ],
   "mutator" : 'embed_builder_mutator',
   "inputsInline": false,
@@ -359,7 +285,7 @@ Blockly.defineBlocksWithJsonArray([
     {
       "type": "field_checkbox",
       "name": "DESCRIPTION",
-      "checked": true
+      "checked": false
     },
     {
       "type": "input_dummy"
@@ -446,7 +372,154 @@ Blockly.defineBlocksWithJsonArray([
   "tooltip": "Deletes a given amount of messages in a Channel.",
   "helpUrl": ""
 },
+{
+  "type": "message_event",
+  "message0": "message %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "NAME",
+      "options": [
+        [
+          "sent",
+          "CREATE"
+        ],
+        [
+          "updated",
+          "UPDATE"
+        ],
+        [
+          "deleted",
+          "DELETE"
+        ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to message creation, update, or deletion has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "message_reaction_event",
+  "message0": "message reaction %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "NAME",
+      "options": [
+        [
+          "added",
+          "ADD"
+        ],
+        [
+          "removed",
+          "REMOVE"
+        ],
+        [
+          "removed all",
+          "REMOVE_ALL"
+        ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to message reaction has occurred.",
+  "helpUrl": ""
+},
 ])
+
+
+Blockly.Blocks['token_input'] = {
+  init: function() {
+    var validator = function(newValue) {
+      if (/^([MN][\w-]{23,25})\.([\w-]{6})\.([\w-]{27,39})$/gm.test(newValue)) {
+        return newValue;
+      } else{
+        return null;
+      }
+    }
+    field = new Blockly.FieldTextInput("Your token here")
+    field.setValidator(validator);
+    this.appendDummyInput()
+        .appendField((field), "TOKEN");
+    this.setOutput(true, "String");
+  }
+};
+
+
+Blockly.Blocks['get_by_id'] = {
+  validate: function(newValue) {
+    this.getSourceBlock().updateConnections(newValue);
+    return newValue;
+  },
+  init: function() {
+    this.setInputsInline(true)
+    this.setColour('%{BKY_ACTION_HUE}')
+    this.setOutput(true, null);
+    var options = [["guild","GUILD"],["channel","CHANNEL"],["user","USER"],["emoji","EMOJI"],["member","MEMBER"],["role","ROLE"]]; 
+    this.appendValueInput('CLIENT')
+      .appendField('with')
+    this.appendDummyInput()
+      .appendField('get')
+      .appendField(new Blockly.FieldDropdown(options,this.validate), 'INSTANCES')
+    this.updateConnections('GUILD')
+  },
+  updateConnections: function(newValue){
+    this.setOutput(true,capitalizeFirstLetter(newValue.toLowerCase()));
+    this.removeInput('ID_INPUT',true)
+    this.removeInput('METHOD',true)
+    parent = this.appendValueInput('ID_INPUT')
+      .appendField('by ID:')
+    if (this.rendered && Workspace && !parent.connection.targetConnection && !parent.sourceBlock.isInFlyout){
+      var InputBlock = Workspace.newBlock('math_number')
+        InputBlock.setShadow(true)
+        InputBlock.initSvg()
+        InputBlock.render();
+      parent.connection.connect(InputBlock.outputConnection)
+    }
+    if (['MEMBER', 'ROLE'].includes(newValue)) {
+      this.appendValueInput('METHOD')
+        .appendField(`of guild`)
+        .setCheck('Guild')
+    }
+  }
+}
+
+
+
+
+
+Blockly.Blocks['client_login'] = {
+  init: function() {
+    this.jsonInit({
+      "type": "client_login",
+      "message0": "login %1 with token",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "LOGIN_INPUT",
+          "check": "Client"
+        }
+      ],
+      "inputsInline": true,
+      "colour": "%{BKY_ACTION_HUE}",
+      "tooltip": "Login the specified Client with the provided token.",
+      "helpUrl": ""
+    })
+    parent = this.appendValueInput('TOKEN_INPUT');
+    if (this.rendered && Workspace && !parent.connection.targetConnection && !parent.sourceBlock.isInFlyout){
+      var InputBlock = Workspace.newBlock('token_input')
+        InputBlock.setShadow(true)
+        InputBlock.initSvg()
+        InputBlock.render();
+      parent.connection.connect(InputBlock.outputConnection)
+    }
+  }
+}
 
 function generateActionBlock(typeLabel,initOptions, updateConnectionsFunction) {
   return {

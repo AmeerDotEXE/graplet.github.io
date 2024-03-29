@@ -21,9 +21,9 @@ python.pythonGenerator.forBlock['console_log'] = function(block, generator) {
 // ACTIONS
   
 python.pythonGenerator.forBlock['client_login'] = function(block, generator) {
-  var value_login_input = generator.valueToCode(block, 'LOGIN_INPUT', python.Order.ATOMIC);
-  var value_token_input = generator.valueToCode(block, 'TOKEN_INPUT', python.Order.NONE);
-  var code = `${value_login_input}.run(${value_token_input})`;
+  var login = generator.valueToCode(block, 'LOGIN_INPUT', javascript.Order.ATOMIC);
+  var token = generator.valueToCode(block, 'TOKEN_INPUT', javascript.Order.NONE);
+  var code = `${login}.run(${token})`;
   return code;
 };
 
@@ -89,10 +89,16 @@ python.pythonGenerator.forBlock['change_guild_name'] = function(block, generator
 };
 
 python.pythonGenerator.forBlock['get_by_id'] = function(block, generator) {
-  var dropdown_instances = block.getFieldValue('INSTANCES');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
-  return code;
+  var client = generator.valueToCode(block, 'CLIENT', python.Order.NONE); // TODO: If block is in a statement block with already client defined, use that client. ( also edit this on block )
+  var instance = block.getFieldValue('INSTANCES');
+  var id_input = generator.valueToCode(block, 'ID_INPUT', python.Order.NONE);
+  if (['MEMBER', 'ROLE'].includes(instance)) {
+    method = generator.valueToCode(block, 'METHOD', python.Order.NONE);
+    var code = `${method}.get_${instance.toLowerCase()}(${id_input})`;
+  }else{
+    var code = `${client}.get_${instance.toLowerCase()}(${id_input})`;
+  }
+  return [code, python.Order.NONE];
 };
 
 
@@ -174,3 +180,7 @@ python.pythonGenerator.forBlock['embed_builder'] = function(block, generator) {
   return [code, python.Order.NONE];
 };
 
+python.pythonGenerator.forBlock['token_input'] = function(block, generator) {
+  var token = block.getFieldValue('TOKEN');
+  return [`"${token}"`, python.Order.NONE];
+};

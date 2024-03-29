@@ -188,7 +188,9 @@ function save() {
 }
 
 
-const batFileScript = '@echo off\nsetlocal\necho GRAPLET V0.8 RUNTIME\necho.\necho Closing this window will stop the bot running process.\necho.\necho If an error occurs please report it in our support server https://discord.gg/5GWccwuWYU so we can fix it.\necho If the window suddenly crashes, consider running it a second time.\necho.\nset "botFile=bot"\nif exist "bot.js" (\n    where node > nul 2>&1\n    if %errorlevel% neq 0 (\n        echo Node.js is not installed. Visit https://nodejs.org/ to install it.\n        goto :end\n    )\n    if not exist "%~dp0\node_modules\discord.js" (\n        echo Installing discord.js...\n        cd /d %~dp0\n        npm install discord.js\n        if %errorlevel% neq 0 (\n            echo Failed to install discord.js. Please check your internet connection and try again.\n            goto :end\n        )\n    )\n    echo Running Node.js script...\n    node "bot.js"\n    if %errorlevel% neq 0 (\n        echo Error: An error occurred while running the Node.js script.\n    )\n) else if exist "bot.py" (\n    where python > nul 2>&1\n    if %errorlevel% neq 0 (\n        echo Python is not installed. Visit https://www.python.org/ to install it.\n        goto :end\n    )\n    pip show discord.py > nul 2>&1\n    if %errorlevel% neq 0 (\n        echo Installing discord.py...\n        pip install discord.py\n        if %errorlevel% neq 0 (\n            echo Failed to install discord.py. Please check your internet connection and try again.\n            goto :end\n        )\n    )\n    echo Running Python bot script...\n    python "bot.py"\n) else (\n    echo No bot file found.\n)\n:end\npause\nendlocal\n'
+const batchFileScript = '@echo off\nsetlocal\n\necho GRAPLET V0.8 RUNTIME\necho.\necho Closing this window will stop the bot running process.\necho.\necho If an error occurs, please report it in our support server https://discord.gg/5GWccwuWYU so we can fix it.\necho If the window suddenly crashes, consider running it a second time.\necho.\n\nset "botFile=bot"\n\nif exist "bot.js" (\n    where node > nul 2>&1\n    if %errorlevel% neq 0 (\n        echo Node.js is not installed. Visit https://nodejs.org/ to install it.\n        goto :end\n    )\n\n    if not exist "%~dp0\\node_modules\\discord.js" (\n        echo Installing discord.js...\n        cd /d %~dp0\n        npm install discord.js\n        if %errorlevel% neq 0 (\n            echo Failed to install discord.js. Please check your internet connection and try again.\n            goto :end\n        )\n    )\n\n    echo Running Node.js script...\n    node "bot.js"\n    if %errorlevel% neq 0 (\n        echo Error: An error occurred while running the Node.js script.\n    )\n) else if exist "bot.py" (\n    where python > nul 2>&1\n    if %errorlevel% neq 0 (\n        echo Python is not installed. Visit https://www.python.org/ to install it.\n        goto :end\n    )\n\n    pip show discord.py > nul 2>&1\n    if %errorlevel% neq 0 (\n        echo Installing discord.py...\n        pip install discord.py\n        if %errorlevel% neq 0 (\n            echo Failed to install discord.py. Please check your internet connection and try again.\n            goto :end\n        )\n    )\n\n    echo Running Python bot script...\n    python "bot.py"\n) else (\n    echo No bot file found.\n    goto :end\n)\n\n:end\npause\nendlocal'
+
+
 
 async function DownloadArchive() {
   const code = document.getElementById('generated-code').value;
@@ -198,7 +200,7 @@ async function DownloadArchive() {
   const e = document.getElementById('code-lang');
   var value = e.options[e.selectedIndex].value;
   zip.file(`bot.${value}`, code);
-  zip.file('run.bat',batFileScript)
+  zip.file('run.bat',batchFileScript)
   const content = await zip.generateAsync({ type: "blob" });
   const zipBlob = new Blob([content]);
   const zipUrl = URL.createObjectURL(zipBlob);

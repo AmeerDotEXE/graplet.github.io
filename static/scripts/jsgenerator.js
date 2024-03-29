@@ -21,9 +21,9 @@ javascript.javascriptGenerator.forBlock['console_log'] = function(block, generat
 // ACTIONS
   
 javascript.javascriptGenerator.forBlock['client_login'] = function(block, generator) {
-  var value_login_input = generator.valueToCode(block, 'LOGIN_INPUT', javascript.Order.ATOMIC);
-  var value_token_input = generator.valueToCode(block, 'TOKEN_INPUT', javascript.Order.NONE);
-  var code = `${value_login_input}.login(${value_token_input});`;
+  var login = generator.valueToCode(block, 'LOGIN_INPUT', javascript.Order.ATOMIC);
+  var token = generator.valueToCode(block, 'TOKEN_INPUT', javascript.Order.NONE);
+  var code = `${login}.login(${token});`;
   return code;
 };
 
@@ -110,34 +110,52 @@ javascript.javascriptGenerator.forBlock['when'] = function(block, generator) {
   const client = generator.valueToCode(block, 'CLIENT', javascript.Order.ATOMIC);
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `${client}.once(${value_event}=>{\n${innerCode}\n});`;
+  var code = `${client}.on(${value_event}, output => {\n${innerCode}\n});`;
   return code;
 };
 
 // EVENT BOOLS
 
-javascript.javascriptGenerator.forBlock['channel_event'] = function(block, generator) {
-  var dropdown_name = block.getFieldValue('EVENT');
-  console.log(dropdown_name)
-  
-  // TODO: get all possible dropdowns
-  var code = '...';
-  // TODO: Change Order.NONE to the correct strength.
-  return [code, javascript.Order.NONE];
-};
-
-javascript.javascriptGenerator.forBlock['emoji_event'] = function(block, generator) {
-  var dropdown_name = block.getFieldValue('NAME');
-  // TODO: Assemble javascript into code variable.
-  var code = '...';
-  // TODO: Change Order.NONE to the correct strength.
-  return [code, javascript.Order.NONE];
-};
-
 javascript.javascriptGenerator.forBlock['clientready'] = function(block, generator) {
   var code = 'Events.ClientReady';
   return [code, javascript.Order.NONE];
 };
+
+function eventConverter(eventPrefix) {
+  return function(block, generator) {
+    var dropdown_name = block.getFieldValue('EVENT') || block.getFieldValue('NAME');
+    var eventName = eventPrefix + toPascalCase(dropdown_name);
+    var code = 'Events.'+eventName;
+    return [code, javascript.Order.NONE];
+  };
+}
+
+function toPascalCase(text) {
+  const originalText = text;
+  let unmodifiedText = undoCases(originalText);
+  let modifiedText = unmodifiedText;
+
+  modifiedText = unmodifiedText.split(" ")
+  .map(txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
+  .join("");
+
+  return modifiedText;
+}
+
+function undoCases(text) {
+  if (typeof text !== "string") return text;
+  if (text.includes(" ")) return text;
+  if (text.includes("_")) return text.replaceAll(/_/g, " ");
+  if (text.includes("-")) return text.replaceAll(/-/g, " ");
+  const regexCapitalized = /([a-z])([A-Z])/g;
+  if (regexCapitalized.test(text)) return text.replace(regexCapitalized, "$1 $2");
+  return text;
+}
+
+javascript.javascriptGenerator.forBlock['channel_event'] = eventConverter("Channel");
+javascript.javascriptGenerator.forBlock['emoji_event'] = eventConverter("Emoji");
+javascript.javascriptGenerator.forBlock['message_event'] = eventConverter("Message");
+javascript.javascriptGenerator.forBlock['message_reaction_event'] = eventConverter("MessageReaction");
 
 
 // INSTANCES
@@ -174,3 +192,7 @@ javascript.javascriptGenerator.forBlock['embed_builder'] = function(block, gener
   return [code, javascript.Order.NONE];
 };
 
+javascript.javascriptGenerator.forBlock['token_input'] = function(block, generator) {
+  var token = block.getFieldValue('TOKEN');
+  return [`"${token}"`,javascript.Order.NONE];
+};

@@ -37,7 +37,7 @@ Blockly.Blocks['text_join'] = {
   onchange: function(){
     for (let i = 0; i < this.inputList.length; i++){
       parentBlock = this.getInput(`ADD${i}`)
-      if (parentBlock && this.rendered && Workspace && !parentBlock.connection.targetConnection && !parentBlock.sourceBlock.isInFlyout){
+      if (this.rendered && parentBlock && Workspace && !parentBlock.connection.targetConnection && !parentBlock.sourceBlock.isInFlyout){
         if (!Workspace.isDragging()){
           var InputBlock = Workspace.newBlock('input')
           InputBlock.setShadow(true)

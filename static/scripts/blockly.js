@@ -109,7 +109,7 @@ if (ProjectIDRoot != '') {
 
 } else {
   console.info("New Project Initiated. Default Blocks loading.");
-  PayloadBlocks = {"blocks":{"languageVersion":0,"blocks":[{"type":"client_login","id":".Q2+Vk+g`%qlZ5OEa;;_","x":-70,"y":430,"inputs":{"LOGIN_INPUT":{"block":{"type":"variables_get","id":"Wv`^}*/U7~yuYB;ajLzU","fields":{"VAR":{"id":"eQu:H?#u)Uu?a*E?7+??"}}}},"TOKEN_INPUT":{"shadow":{"type":"input","id":"F[rIyj-k[r*-7l#itoE]","fields":{"TEXT":"Your token here"}}}}},{"type":"once","id":"-b+q1;OCmJ]CAq,|0)p;","x":-70,"y":250,"inputs":{"CLIENT":{"block":{"type":"variables_get","id":"8An!FFT/5h/29,Z2|#^p","fields":{"VAR":{"id":"eQu:H?#u)Uu?a*E?7+??"}}}},"EVENT":{"block":{"type":"clientready","id":"ILv-1S+I9DF*)pD~?,Fg"}},"DO":{"block":{"type":"console_log","id":"*tzh|)MK9iGx09Rp$|_B","inputs":{"LOG":{"shadow":{"type":"input","id":"qy+}+eBfL9XZA!C|!-Eg","fields":{"TEXT":"client is ready!"}}}}}}}},{"type":"variables_set","id":"!ee1zJ|6-jLm;J_7mDQ+","x":-70,"y":150,"fields":{"VAR":{"id":"eQu:H?#u)Uu?a*E?7+??"}},"inputs":{"VALUE":{"block":{"type":"client","id":"tz55?Z6?_c`WP:mvN$ir"}}}}]},"variables":[{"name":"client","id":"eQu:H?#u)Uu?a*E?7+??"}]};
+  PayloadBlocks = {"blocks":{"languageVersion":0,"blocks":[{"type":"client_login","id":"znP|/(LiaAZY:`kJ){|/","x":-1070,"y":-170,"inputs":{"LOGIN_INPUT":{"block":{"type":"variables_get","id":"/A-Z*DfYw^b.D2nanFnt","fields":{"VAR":{"id":"?Jr[#_LebMSiQb?l67Te"}}}},"TOKEN_INPUT":{"shadow":{"type":"token_input","id":"MuIXy`f6901mOyF@PehH","fields":{"TOKEN":"Your token here"}}}}},{"type":"once","id":"3!Han~H{5xmaD+)N^sM|","x":-1030,"y":-350,"inputs":{"EVENT":{"block":{"type":"clientready","id":"K8[g-L/KE*X$g-3d,ZfJ"}},"CLIENT":{"block":{"type":"variables_get","id":"R.[]gGmk6xVr0+mKUqiw","fields":{"VAR":{"id":"?Jr[#_LebMSiQb?l67Te"}}}},"DO":{"block":{"type":"console_log","id":"N=*D/jc,$@aCJCNIexo5","inputs":{"LOG":{"shadow":{"type":"input","id":"x7uQI*FnB99~i~eR,fJH","fields":{"TEXT":"we have logged in!"}}}}}}}},{"type":"variables_set","id":"Msty%zgPTM8HKx]CWx8~","x":-970,"y":-430,"fields":{"VAR":{"id":"?Jr[#_LebMSiQb?l67Te"}},"inputs":{"VALUE":{"shadow":{"type":"input","id":"(kGvdg8ho9I}K96Jv2Hz","fields":{"TEXT":""}},"block":{"type":"client","id":"W|6Jc^d+eQ8@3wCSKOrw"}}}}]},"variables":[{"name":"client","id":"?Jr[#_LebMSiQb?l67Te"}]};
   Blockly.serialization.workspaces.load(PayloadBlocks, Workspace);
 }
 
@@ -161,12 +161,12 @@ function updateCode(lang){
     document.getElementById('dependecy-text').innerHTML = 'Ensure you have <a href="https://nodejs.org/en">Node.js</a> installed.';
     document.getElementById('dependecy-run').innerHTML = '<li>type <code>npm install discord.js</code> to install the necessary packages</li>\n<li>Finally, run the bot using <code>node bot.js</code></li>';
     const code = javascript.javascriptGenerator.workspaceToCode(Workspace);
-    output.textContent =  `// Javascript\nconst { Client, Events, GatewayIntentBits } = require('discord.js');\n${code}`;
+    output.textContent =  `const { Client, Events, GatewayIntentBits } = require('discord.js');\n${code}`;
   } else if (lang == 'py'){
     document.getElementById('dependecy-text').innerHTML = 'Ensure you have <a href="https://python.org/downloads">Python</a> installed.';
     document.getElementById('dependecy-run').innerHTML = '<li>type <code>pip install discord.py</code> to install the necessary modules</li>\n<li>Finally, run the bot using <code>python bot.py</code></li>';
     const code = python.pythonGenerator.workspaceToCode(Workspace);
-    output.textContent = `# Python\nimport discord\n${code}`
+    output.textContent = `import discord\n${code}`
   }
 } 
 
