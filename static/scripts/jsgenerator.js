@@ -89,9 +89,23 @@ javascript.javascriptGenerator.forBlock['change_guild_name'] = function(block, g
 
 javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator) {
   var dropdown_instances = block.getFieldValue('INSTANCES');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
-  return code;
+  var id_input = generator.valueToCode(block, 'ID_INPUT', python.Order.NONE);
+
+  var code = 'null';
+
+  //TYPE ${dropdown_instances}
+  //GUILD,CHANNEL,USER,EMOJI,MEMBER,ROLE
+  if (['MEMBER', 'ROLE'].includes(dropdown_instances)) {
+    method = generator.valueToCode(block, 'METHOD', python.Order.NONE);
+    code = `(await ${method}.${dropdown_instances.toLowerCase()}s.fetch("${id_input}"))`;
+  } else if (dropdown_instances == "EMOJI") {
+    code = `client.${dropdown_instances.toLowerCase()}s.resolve("${id_input}")`;
+  } else {
+    //guilds, channels, users
+    code = `(await client.${dropdown_instances.toLowerCase()}s.fetch("${id_input}"))`;
+  }
+
+  return [code, python.Order.NONE];
 };
 
 
@@ -117,37 +131,6 @@ javascript.javascriptGenerator.forBlock['botready'] = function(block, generator)
   var code = 'Events.ClientReady';
   return [code, javascript.Order.NONE];
 };
-
-function eventConverter(eventPrefix) {
-  return function(block, generator) {
-    var dropdown_name = block.getFieldValue('EVENT') || block.getFieldValue('NAME');
-    var eventName = eventPrefix + toPascalCase(dropdown_name);
-    var code = 'Events.'+eventName;
-    return [code, javascript.Order.NONE];
-  };
-}
-
-function toPascalCase(text) {
-  const originalText = text;
-  let unmodifiedText = undoCases(originalText);
-  let modifiedText = unmodifiedText;
-
-  modifiedText = unmodifiedText.split(" ")
-  .map(txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
-  .join("");
-
-  return modifiedText;
-}
-
-function undoCases(text) {
-  if (typeof text !== "string") return text;
-  if (text.includes(" ")) return text;
-  if (text.includes("_")) return text.replaceAll(/_/g, " ");
-  if (text.includes("-")) return text.replaceAll(/-/g, " ");
-  const regexCapitalized = /([a-z])([A-Z])/g;
-  if (regexCapitalized.test(text)) return text.replace(regexCapitalized, "$1 $2");
-  return text;
-}
 
 javascript.javascriptGenerator.forBlock['channel_event'] = eventConverter("Channel");
 javascript.javascriptGenerator.forBlock['emoji_event'] = eventConverter("Emoji");
@@ -187,3 +170,38 @@ javascript.javascriptGenerator.forBlock['token_input'] = function(block, generat
   var token = block.getFieldValue('TOKEN');
   return [`"${token}"`,javascript.Order.NONE];
 };
+
+
+
+
+
+function eventConverter(eventPrefix) {
+  return function(block, generator) {
+    var dropdown_name = block.getFieldValue('EVENT') || block.getFieldValue('NAME');
+    var eventName = eventPrefix + toPascalCase(dropdown_name);
+    var code = 'Events.'+eventName;
+    return [code, javascript.Order.NONE];
+  };
+}
+
+function toPascalCase(text) {
+  const originalText = text;
+  let unmodifiedText = undoCases(originalText);
+  let modifiedText = unmodifiedText;
+
+  modifiedText = unmodifiedText.split(" ")
+  .map(txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
+  .join("");
+
+  return modifiedText;
+}
+
+function undoCases(text) {
+  if (typeof text !== "string") return text;
+  if (text.includes(" ")) return text;
+  if (text.includes("_")) return text.replaceAll(/_/g, " ");
+  if (text.includes("-")) return text.replaceAll(/-/g, " ");
+  const regexCapitalized = /([a-z])([A-Z])/g;
+  if (regexCapitalized.test(text)) return text.replace(regexCapitalized, "$1 $2");
+  return text;
+}
