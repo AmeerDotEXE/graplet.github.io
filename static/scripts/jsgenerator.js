@@ -137,6 +137,12 @@ javascript.javascriptGenerator.forBlock['channel_event'] = eventConverter("Chann
 javascript.javascriptGenerator.forBlock['emoji_event'] = eventConverter("Emoji");
 javascript.javascriptGenerator.forBlock['message_event'] = eventConverter("Message");
 javascript.javascriptGenerator.forBlock['message_reaction_event'] = eventConverter("MessageReaction");
+javascript.javascriptGenerator.forBlock['guild_event'] = eventConverter("Guild");
+javascript.javascriptGenerator.forBlock['guild_emoji_event'] = eventConverter("GuildEmoji");
+javascript.javascriptGenerator.forBlock['guild_sticker_event'] = eventConverter("GuildSticker");
+javascript.javascriptGenerator.forBlock['guild_member_event'] = eventConverter("GuildMember");
+javascript.javascriptGenerator.forBlock['guild_role_event'] = eventConverter("GuildRole");
+javascript.javascriptGenerator.forBlock['guild_scheduled_event_event'] = eventConverter("GuildScheduledEvent");
 
 
 // INSTANCES

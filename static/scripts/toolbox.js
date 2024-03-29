@@ -183,6 +183,30 @@ var toolbox = {
             'type': 'message_reaction_event',
             'kind': 'block',
           },
+          {
+            'type': 'guild_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'guild_emoji_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'guild_sticker_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'guild_member_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'guild_role_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'guild_scheduled_event_event',
+            'kind': 'block',
+          },
 
         ]
       },
