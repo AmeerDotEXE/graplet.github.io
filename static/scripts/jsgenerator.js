@@ -117,7 +117,7 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
 
   //TYPE ${dropdown_instances}
   //GUILD,CHANNEL,USER,EMOJI,MEMBER,ROLE
-  if (['MEMBER', 'ROLE'].includes(dropdown_instances)) {
+  if (['MEMBER', 'ROLE', 'MESSAGE'].includes(dropdown_instances)) {
     method = generator.valueToCode(block, 'METHOD', javascript.Order.NONE);
     code = `(await ${method}.${dropdown_instances.toLowerCase()}s.fetch("${id_input}"))`;
   } else if (dropdown_instances == "EMOJI") {

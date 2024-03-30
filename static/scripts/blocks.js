@@ -644,7 +644,7 @@ Blockly.Blocks['get_by_id'] = {
     this.setInputsInline(true)
     this.setColour('%{BKY_ACTION_HUE}')
     this.setOutput(true, null);
-    var options = [["guild","GUILD"],["channel","CHANNEL"],["user","USER"],["emoji","EMOJI"],["member","MEMBER"],["role","ROLE"]]; 
+    var options = [["guild","GUILD"],["channel","CHANNEL"],["user","USER"],["message","MESSAGE"],["emoji","EMOJI"],["member","MEMBER"],["role","ROLE"]]; 
     this.appendDummyInput()
       .appendField('get')
       .appendField(new Blockly.FieldDropdown(options,this.validate), 'INSTANCES')
@@ -667,6 +667,11 @@ Blockly.Blocks['get_by_id'] = {
       this.appendValueInput('METHOD')
         .appendField(`of guild`)
         .setCheck('Guild')
+    }
+    if (newValue == 'MESSAGE') {
+      this.appendValueInput('METHOD')
+        .appendField(`of channel`)
+        .setCheck('Channel')
     }
   }
 }
