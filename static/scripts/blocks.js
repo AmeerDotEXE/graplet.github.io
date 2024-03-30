@@ -367,7 +367,7 @@ Blockly.defineBlocksWithJsonArray([
           "CREATE"
         ],
         [
-          "updated",
+          "edited",
           "UPDATE"
         ],
         [
@@ -649,3 +649,4 @@ var roleActions = generateActionBlock('role',[
     .setCheck('Role')
   }
 });
+  
