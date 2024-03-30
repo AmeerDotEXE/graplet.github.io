@@ -61,9 +61,28 @@ javascript.javascriptGenerator.forBlock['bulk_delete'] = function(block, generat
 };
 
 javascript.javascriptGenerator.forBlock['channel_action'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+  var dropdown_action = block.getFieldValue('TYPE');
+  var code = 'null\n';
+
+  if (dropdown_action == "DELETE") {
+    var action_channel = generator.valueToCode(block, 'DELETE', javascript.Order.NONE);
+    code = `await ${action_channel}.delete();\n`;
+  } else if (dropdown_action == "EDIT") {
+    var action_channel = generator.valueToCode(block, 'EDIT', javascript.Order.NONE);
+    var action_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+    code = `await ${action_role}.setName(${action_name});\n`;
+  } else if (dropdown_action == "CREATE") {
+    var channel_type = 'null';
+    var action_channel_type = block.getFieldValue('CHANNELTYPE');
+    var action_guild = generator.valueToCode(block, 'GUILD', javascript.Order.NONE);
+    var action_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+
+    if (action_channel_type == 'STAGE') action_channel_type = "STAGE_VOICE";
+    channel_type = "Discord.ChannelType.Guild"+toPascalCase(action_channel_type);
+
+    code = `await ${action_guild}.channels.create({ name: ${action_name}, type: ${channel_type} });\n`;
+  }
+
   return code;
 };
 
@@ -88,9 +107,23 @@ javascript.javascriptGenerator.forBlock['message_action'] = function(block, gene
 };
 
 javascript.javascriptGenerator.forBlock['role_action'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+  var dropdown_action = block.getFieldValue('TYPE');
+  var code = 'null\n';
+
+  if (dropdown_action == "DELETE") {
+    var action_role = generator.valueToCode(block, 'DELETE', javascript.Order.NONE);
+    code = `await ${action_role}.delete();\n`;
+  } else if (dropdown_action == "EDIT") {
+    var action_role = generator.valueToCode(block, 'EDIT', javascript.Order.NONE);
+    var action_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+    code = `await ${action_role}.edit({ name: ${action_name} });\n`;
+  } else if (dropdown_action == "CREATE") {
+    var action_guild = generator.valueToCode(block, 'CREATE', javascript.Order.NONE);
+    var action_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+    var action_color = generator.valueToCode(block, 'COLOUR', javascript.Order.NONE);
+    code = `await ${action_guild}.roles.create({ name: ${action_name}, color: ${action_color} });\n`;
+  }
+
   return code;
 };
 
@@ -150,7 +183,7 @@ javascript.javascriptGenerator.forBlock['when'] = function(block, generator) {
 // EVENT BOOLS
 
 javascript.javascriptGenerator.forBlock['botready'] = function(block, generator) {
-  var code = 'Events.ClientReady';
+  var code = 'Discord.Events.ClientReady';
   return [code, javascript.Order.NONE];
 };
 
@@ -207,7 +240,7 @@ function eventConverter(eventPrefix) {
   return function(block, generator) {
     var dropdown_name = block.getFieldValue('EVENT') || block.getFieldValue('NAME');
     var eventName = eventPrefix + toPascalCase(dropdown_name);
-    var code = 'Events.'+eventName;
+    var code = 'Discord.Events.'+eventName;
     return [code, javascript.Order.NONE];
   };
 }
