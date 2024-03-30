@@ -64,6 +64,9 @@ var Workspace = Blockly.inject("blocklyDiv", {
 
 console.info('Blockly injected.');
 
+// Disable top blocks
+Workspace.addChangeListener(Blockly.Events.disableOrphans);
+
 const options = {
   contextMenu: true,
   shortcut: true,
