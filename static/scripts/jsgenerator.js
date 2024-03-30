@@ -30,8 +30,15 @@ javascript.javascriptGenerator.forBlock['add_reaction'] = function(block, genera
   var dropdown_action = block.getFieldValue('ACTION');
   var value_reaction = generator.valueToCode(block, 'REACTION', javascript.Order.ATOMIC);
   var value_message = generator.valueToCode(block, 'MESSAGE', javascript.Order.ATOMIC);
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+
+  var code = 'null\n';
+
+  if (dropdown_action == "ADD") {
+    code = `await ${value_message}.react(${value_reaction});\n`;
+  } else if (dropdown_action == "REMOVE") {
+    code = `await ${value_message}.reactions.resolve(${value_reaction}).users.remove(client.user.id);\n`;
+  }
+
   return code;
 };
 
@@ -39,16 +46,17 @@ javascript.javascriptGenerator.forBlock['response_reply'] = function(block, gene
   var field_status = block.getFieldValue('STATUS');
   var value_message = generator.valueToCode(block, 'MESSAGE', javascript.Order.ATOMIC);
   var value_content = generator.valueToCode(block, 'CONTENT', javascript.Order.ATOMIC);
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+
+  var code = `await ${value_message}.reply(${value_content});\n`;
+
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['bulk_delete'] = function(block, generator) {
   var value_channel = generator.valueToCode(block, 'CHANNEL', javascript.Order.ATOMIC);
   var value_amount = generator.valueToCode(block, 'AMOUNT', javascript.Order.ATOMIC);
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+
+  var code = `await ${value_channel}.bulkDelete(${value_amount});\n`;
   return code;
 };
 
@@ -60,9 +68,22 @@ javascript.javascriptGenerator.forBlock['channel_action'] = function(block, gene
 };
 
 javascript.javascriptGenerator.forBlock['message_action'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+  var dropdown_action = block.getFieldValue('TYPE');
+  var code = 'null\n';
+
+  if (dropdown_action == "DELETE") {
+    var action_message = generator.valueToCode(block, 'DELETE', javascript.Order.NONE);
+    code = `await ${action_message}.delete();\n`;
+  } else if (dropdown_action == "EDIT") {
+    var action_message = generator.valueToCode(block, 'EDIT', javascript.Order.NONE);
+    var action_content = generator.valueToCode(block, 'CONTENT', javascript.Order.NONE);
+    code = `await ${action_message}.edit(${action_content});\n`;
+  } else if (dropdown_action == "SEND") {
+    var action_channel = generator.valueToCode(block, 'SEND', javascript.Order.NONE);
+    var action_content = generator.valueToCode(block, 'CONTENT', javascript.Order.NONE);
+    code = `await ${action_channel}.send(${action_content});\n`;
+  }
+
   return code;
 };
 
