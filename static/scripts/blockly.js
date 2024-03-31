@@ -64,6 +64,9 @@ var Workspace = Blockly.inject("blocklyDiv", {
 
 console.info('Blockly injected.');
 
+// Disable top blocks
+Workspace.addChangeListener(Blockly.Events.disableOrphans);
+
 const options = {
   contextMenu: true,
   shortcut: true,
@@ -161,12 +164,12 @@ function updateCode(lang){
     document.getElementById('dependecy-text').innerHTML = 'Ensure you have <a href="https://nodejs.org/en">Node.js</a> installed.';
     document.getElementById('dependecy-run').innerHTML = '<li>type <code>npm install discord.js</code> to install the necessary packages</li>\n<li>Finally, run the bot using <code>node bot.js</code></li>';
     const code = javascript.javascriptGenerator.workspaceToCode(Workspace);
-    output.textContent =  `const { Client, Events, GatewayIntentBits } = require('discord.js');\nconst client = new Client({ intents: [GatewayIntentBits.Guilds]})\n${code}`;
+    output.textContent =  `const Discord = require('discord.js');\nconst client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds]})\n\n${code}`;
   } else if (lang == 'py'){
     document.getElementById('dependecy-text').innerHTML = 'Ensure you have <a href="https://python.org/downloads">Python</a> installed.';
     document.getElementById('dependecy-run').innerHTML = '<li>type <code>pip install discord.py</code> to install the necessary modules</li>\n<li>Finally, run the bot using <code>python bot.py</code></li>';
     const code = python.pythonGenerator.workspaceToCode(Workspace);
-    output.textContent = `import discord\nclient = discord.Client(intents=discord.Intents.all())\n${code}`
+    output.textContent = `import discord\nclient = discord.Client(intents=discord.Intents.all())\n\n${code}`
   }
 } 
 

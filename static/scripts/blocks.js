@@ -158,6 +158,208 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
+  "type": "guild_event",
+  "message0": "server %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "NAME",
+      "options": [
+        [
+          "updated",
+          "UPDATE"
+        ],
+        [
+          "available",
+          "AVAILABLE"
+        ],
+        [
+          "unavailable",
+          "UNAVAILABLE"
+        ],
+        [
+          "banned user",
+          "BAN_ADD"
+        ],
+        [
+          "unbanned user",
+          "BAN_REMOVE"
+        ],
+        [
+          "joined",
+          "CREATE"
+        ],
+        [
+          "left",
+          "DELETE"
+        ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action between bot and a server has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "guild_emoji_event",
+  "message0": "server emoji %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "NAME",
+      "options": [
+        [
+          "created",
+          "CREATE"
+        ],
+        [
+          "updated",
+          "UPDATE"
+        ],
+        [
+          "deleted",
+          "DELETE"
+        ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to server emoji creation, update, or deletion has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "guild_sticker_event",
+  "message0": "server sticker %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "NAME",
+      "options": [
+        [
+          "created",
+          "CREATE"
+        ],
+        [
+          "updated",
+          "UPDATE"
+        ],
+        [
+          "deleted",
+          "DELETE"
+        ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to server emoji creation, update, or deletion has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "guild_member_event",
+  "message0": "server member %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "NAME",
+      "options": [
+        [
+          "joined",
+          "ADD"
+        ],
+        [
+          "updated",
+          "UPDATE"
+        ],
+        [
+          "left",
+          "REMOVE"
+        ],
+        [
+          "available",
+          "AVAILABLE"
+        ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to server members has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "guild_role_event",
+  "message0": "server role %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "NAME",
+      "options": [
+        [
+          "created",
+          "CREATE"
+        ],
+        [
+          "updated",
+          "UPDATE"
+        ],
+        [
+          "deleted",
+          "DELETE"
+        ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to server role creation, update, or deletion has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "guild_scheduled_event_event",
+  "message0": "server scheduled event %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "NAME",
+      "options": [
+        [
+          "created",
+          "CREATE"
+        ],
+        [
+          "updated",
+          "UPDATE"
+        ],
+        [
+          "deleted",
+          "DELETE"
+        ],
+        [
+          "member interested",
+          "USER_ADD"
+        ],
+        [
+          "member uninterested",
+          "USER_REMOVE"
+        ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to server members has occurred.",
+  "helpUrl": ""
+},
+{
   "type": "botready",
   "message0": "bot is ready",
   "output": "Boolean",
@@ -442,7 +644,7 @@ Blockly.Blocks['get_by_id'] = {
     this.setInputsInline(true)
     this.setColour('%{BKY_ACTION_HUE}')
     this.setOutput(true, null);
-    var options = [["guild","GUILD"],["channel","CHANNEL"],["user","USER"],["emoji","EMOJI"],["member","MEMBER"],["role","ROLE"]]; 
+    var options = [["guild","GUILD"],["channel","CHANNEL"],["user","USER"],["message","MESSAGE"],["emoji","EMOJI"],["member","MEMBER"],["role","ROLE"]]; 
     this.appendDummyInput()
       .appendField('get')
       .appendField(new Blockly.FieldDropdown(options,this.validate), 'INSTANCES')
@@ -465,6 +667,11 @@ Blockly.Blocks['get_by_id'] = {
       this.appendValueInput('METHOD')
         .appendField(`of guild`)
         .setCheck('Guild')
+    }
+    if (newValue == 'MESSAGE') {
+      this.appendValueInput('METHOD')
+        .appendField(`of channel`)
+        .setCheck('Channel')
     }
   }
 }

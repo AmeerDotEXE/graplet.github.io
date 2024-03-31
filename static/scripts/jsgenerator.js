@@ -16,13 +16,13 @@ javascript.javascriptGenerator.forBlock['colour_hsv_sliders'] = function (block,
 
 javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
   const LOG = generator.valueToCode(block, 'LOG', javascript.Order.NONE);
-  return `console.log(${LOG});`};
+  return `console.log(${LOG});\n`};
   
 // ACTIONS
   
 javascript.javascriptGenerator.forBlock['bot_login'] = function(block, generator) {
   var token = generator.valueToCode(block, 'TOKEN_INPUT', javascript.Order.NONE);
-  var code = `client.login(${token});`;
+  var code = `client.login(${token});\n`;
   return code;
 };
 
@@ -30,8 +30,15 @@ javascript.javascriptGenerator.forBlock['add_reaction'] = function(block, genera
   var dropdown_action = block.getFieldValue('ACTION');
   var value_reaction = generator.valueToCode(block, 'REACTION', javascript.Order.ATOMIC);
   var value_message = generator.valueToCode(block, 'MESSAGE', javascript.Order.ATOMIC);
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+
+  var code = 'null\n';
+
+  if (dropdown_action == "ADD") {
+    code = `await ${value_message}.react(${value_reaction});\n`;
+  } else if (dropdown_action == "REMOVE") {
+    code = `await ${value_message}.reactions.resolve(${value_reaction}).users.remove(client.user.id);\n`;
+  }
+
   return code;
 };
 
@@ -39,37 +46,84 @@ javascript.javascriptGenerator.forBlock['response_reply'] = function(block, gene
   var field_status = block.getFieldValue('STATUS');
   var value_message = generator.valueToCode(block, 'MESSAGE', javascript.Order.ATOMIC);
   var value_content = generator.valueToCode(block, 'CONTENT', javascript.Order.ATOMIC);
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+
+  var code = `await ${value_message}.reply(${value_content});\n`;
+
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['bulk_delete'] = function(block, generator) {
   var value_channel = generator.valueToCode(block, 'CHANNEL', javascript.Order.ATOMIC);
   var value_amount = generator.valueToCode(block, 'AMOUNT', javascript.Order.ATOMIC);
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+
+  var code = `await ${value_channel}.bulkDelete(${value_amount});\n`;
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['channel_action'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+  var dropdown_action = block.getFieldValue('TYPE');
+  var code = 'null\n';
+
+  if (dropdown_action == "DELETE") {
+    var action_channel = generator.valueToCode(block, 'DELETE', javascript.Order.NONE);
+    code = `await ${action_channel}.delete();\n`;
+  } else if (dropdown_action == "EDIT") {
+    var action_channel = generator.valueToCode(block, 'EDIT', javascript.Order.NONE);
+    var action_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+    code = `await ${action_role}.setName(${action_name});\n`;
+  } else if (dropdown_action == "CREATE") {
+    var channel_type = 'null';
+    var action_channel_type = block.getFieldValue('CHANNELTYPE');
+    var action_guild = generator.valueToCode(block, 'GUILD', javascript.Order.NONE);
+    var action_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+
+    if (action_channel_type == 'STAGE') action_channel_type = "STAGE_VOICE";
+    channel_type = "Discord.ChannelType.Guild"+toPascalCase(action_channel_type);
+
+    code = `await ${action_guild}.channels.create({ name: ${action_name}, type: ${channel_type} });\n`;
+  }
+
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['message_action'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+  var dropdown_action = block.getFieldValue('TYPE');
+  var code = 'null\n';
+
+  if (dropdown_action == "DELETE") {
+    var action_message = generator.valueToCode(block, 'DELETE', javascript.Order.NONE);
+    code = `await ${action_message}.delete();\n`;
+  } else if (dropdown_action == "EDIT") {
+    var action_message = generator.valueToCode(block, 'EDIT', javascript.Order.NONE);
+    var action_content = generator.valueToCode(block, 'CONTENT', javascript.Order.NONE);
+    code = `await ${action_message}.edit(${action_content});\n`;
+  } else if (dropdown_action == "SEND") {
+    var action_channel = generator.valueToCode(block, 'SEND', javascript.Order.NONE);
+    var action_content = generator.valueToCode(block, 'CONTENT', javascript.Order.NONE);
+    code = `await ${action_channel}.send(${action_content});\n`;
+  }
+
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['role_action'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+  var dropdown_action = block.getFieldValue('TYPE');
+  var code = 'null\n';
+
+  if (dropdown_action == "DELETE") {
+    var action_role = generator.valueToCode(block, 'DELETE', javascript.Order.NONE);
+    code = `await ${action_role}.delete();\n`;
+  } else if (dropdown_action == "EDIT") {
+    var action_role = generator.valueToCode(block, 'EDIT', javascript.Order.NONE);
+    var action_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+    code = `await ${action_role}.edit({ name: ${action_name} });\n`;
+  } else if (dropdown_action == "CREATE") {
+    var action_guild = generator.valueToCode(block, 'CREATE', javascript.Order.NONE);
+    var action_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+    var action_color = generator.valueToCode(block, 'COLOUR', javascript.Order.NONE);
+    code = `await ${action_guild}.roles.create({ name: ${action_name}, color: ${action_color} });\n`;
+  }
+
   return code;
 };
 
@@ -81,22 +135,23 @@ javascript.javascriptGenerator.forBlock['user_action'] = function(block, generat
 };
 
 javascript.javascriptGenerator.forBlock['change_guild_name'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
+  var value_guild = generator.valueToCode(block, 'GUILD', javascript.Order.NONE);
+  var value_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
+
+  var code = `await ${value_guild}.setName(${value_name});\n`;
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator) {
   var dropdown_instances = block.getFieldValue('INSTANCES');
-  var id_input = generator.valueToCode(block, 'ID_INPUT', python.Order.NONE);
+  var id_input = generator.valueToCode(block, 'ID_INPUT', javascript.Order.NONE);
 
   var code = 'null';
 
   //TYPE ${dropdown_instances}
   //GUILD,CHANNEL,USER,EMOJI,MEMBER,ROLE
-  if (['MEMBER', 'ROLE'].includes(dropdown_instances)) {
-    method = generator.valueToCode(block, 'METHOD', python.Order.NONE);
+  if (['MEMBER', 'ROLE', 'MESSAGE'].includes(dropdown_instances)) {
+    method = generator.valueToCode(block, 'METHOD', javascript.Order.NONE);
     code = `(await ${method}.${dropdown_instances.toLowerCase()}s.fetch("${id_input}"))`;
   } else if (dropdown_instances == "EMOJI") {
     code = `client.${dropdown_instances.toLowerCase()}s.resolve("${id_input}")`;
@@ -105,7 +160,7 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
     code = `(await client.${dropdown_instances.toLowerCase()}s.fetch("${id_input}"))`;
   }
 
-  return [code, python.Order.NONE];
+  return [code, javascript.Order.NONE];
 };
 
 
@@ -114,21 +169,21 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
 javascript.javascriptGenerator.forBlock['once'] = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `client.once(${value_event}, async() => {\n${innerCode}\n});`;
+  var code = `client.once(${value_event}, async() => {\n${innerCode}\n});\n`;
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['when'] = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `client.on(${value_event}, output => {\n${innerCode}\n});`;
+  var code = `client.on(${value_event}, async(output) => {\n${innerCode}\n});\n`;
   return code;
 };
 
 // EVENT BOOLS
 
 javascript.javascriptGenerator.forBlock['botready'] = function(block, generator) {
-  var code = 'Events.ClientReady';
+  var code = 'Discord.Events.ClientReady';
   return [code, javascript.Order.NONE];
 };
 
@@ -136,6 +191,12 @@ javascript.javascriptGenerator.forBlock['channel_event'] = eventConverter("Chann
 javascript.javascriptGenerator.forBlock['emoji_event'] = eventConverter("Emoji");
 javascript.javascriptGenerator.forBlock['message_event'] = eventConverter("Message");
 javascript.javascriptGenerator.forBlock['message_reaction_event'] = eventConverter("MessageReaction");
+javascript.javascriptGenerator.forBlock['guild_event'] = eventConverter("Guild");
+javascript.javascriptGenerator.forBlock['guild_emoji_event'] = eventConverter("GuildEmoji");
+javascript.javascriptGenerator.forBlock['guild_sticker_event'] = eventConverter("GuildSticker");
+javascript.javascriptGenerator.forBlock['guild_member_event'] = eventConverter("GuildMember");
+javascript.javascriptGenerator.forBlock['guild_role_event'] = eventConverter("GuildRole");
+javascript.javascriptGenerator.forBlock['guild_scheduled_event_event'] = eventConverter("GuildScheduledEvent");
 
 
 // INSTANCES
@@ -179,7 +240,7 @@ function eventConverter(eventPrefix) {
   return function(block, generator) {
     var dropdown_name = block.getFieldValue('EVENT') || block.getFieldValue('NAME');
     var eventName = eventPrefix + toPascalCase(dropdown_name);
-    var code = 'Events.'+eventName;
+    var code = 'Discord.Events.'+eventName;
     return [code, javascript.Order.NONE];
   };
 }
