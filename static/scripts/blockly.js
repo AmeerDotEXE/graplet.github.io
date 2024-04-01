@@ -111,7 +111,7 @@ if (ProjectIDRoot != '') {
 
 } else {
   console.info("New Project Initiated. Default Blocks loading.");
-  PayloadBlocks = {"blocks":{"languageVersion":0,"blocks":[{"type":"bot_login","id":"EfmK.b-lkZU_$cP}n[:`","x":-410,"y":290,"inputs":{"TOKEN_INPUT":{"shadow":{"type":"token_input","id":"3K?6nV7Se+,L8u8U0@qN","fields":{"TOKEN":"Your token here"}}}}},{"type":"once","id":"xRRtwo%Fd0$l%bvjluqJ","x":-410,"y":90,"inputs":{"EVENT":{"block":{"type":"botready","id":"#Wh1tj8h03-`$JPb,TC2"}},"DO":{"block":{"type":"terminal_log","id":"e%{:7BOv{nvgeRS0*MrO","inputs":{"LOG":{"shadow":{"type":"input","id":"*R~;i)$Pp,Mpge[}?3.c","fields":{"TEXT":"we have logged in the bot!"}}}}}}}}]},"variables":[{"name":"client","id":"?Jr[#_LebMSiQb?l67Te"}]};
+  PayloadBlocks = {"blocks":{"languageVersion":0,"blocks":[{"type":"bot_login","id":"EfmK.b-lkZU_$cP}n[:`","x":-410,"y":290,"inputs":{"TOKEN_INPUT":{"shadow":{"type":"token_input","id":"3K?6nV7Se+,L8u8U0@qN","fields":{"TOKEN":"Your token here"}}}}},{"type":"once","id":"xRRtwo%Fd0$l%bvjluqJ","x":-410,"y":90,"inputs":{"EVENT":{"block":{"type":"botready","id":"#Wh1tj8h03-`$JPb,TC2"}},"DO":{"block":{"type":"terminal_log","id":"e%{:7BOv{nvgeRS0*MrO","inputs":{"LOG":{"shadow":{"type":"input","id":"*R~;i)$Pp,Mpge[}?3.c","fields":{"TEXT":"we have logged in the bot!"}}}}}}}}]}};
   Blockly.serialization.workspaces.load(PayloadBlocks, Workspace);
 }
 
