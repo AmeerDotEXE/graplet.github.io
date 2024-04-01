@@ -163,11 +163,11 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
 
 // EVENTS
 
-javascript.javascriptGenerator.forBlock['once'] = function(block, generator) {
+const eventListenerBlocks = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
   const eventBlock = block.getInputTargetBlock("EVENT");
-  let argsString = eventBlock?.genEventRags.map(x => "event_"+x[0]).join(", ") || "";
+  let argsString = eventBlock?.genEventRags.map(x => "event_"+to_snake_case(x[0])).join(", ") || "";
 
   block.eventArgsList = eventBlock?.genEventRags || [];
   if (block.lastEventArgs == null) {
@@ -194,10 +194,10 @@ javascript.javascriptGenerator.forBlock['once'] = function(block, generator) {
   //handle event change and remove references
   if (block.lastEventArgs !== block.eventArgsList) {
 
+    //remove variable and its copies
     block.connectedEventArgs.forEach(x => x.dispose(true));
     block.connectedEventArgs = [];
     block.lastEventArgs.forEach((x,i) => {
-      //remove variable and its children
       block.removeInput("ARG"+(i+1));
     });
 
@@ -213,7 +213,7 @@ javascript.javascriptGenerator.forBlock['once'] = function(block, generator) {
       InputBlock.render();
       let inputField = block.appendValueInput('ARG'+(index+1));
       if (index == 0) {
-        inputField.appendField('Outputs:')
+        inputField.appendField('Outputs:');
       }
       inputField.connection.connect(InputBlock.outputConnection);
       block.connectedEventArgs.push(InputBlock);
@@ -221,73 +221,15 @@ javascript.javascriptGenerator.forBlock['once'] = function(block, generator) {
     }
   }
 
-  var code = `client.once(${value_event}, async(${argsString}) => {\n${innerCode}\n});\n`;
+  var eventType = block.type;
+  if (eventType == "when") eventType = "on";
+  var code = `client.${eventType}(${value_event}, async(${argsString}) => {\n${innerCode}\n});\n`;
   return code;
 };
-
-javascript.javascriptGenerator.forBlock['when'] = function(block, generator) {
-  const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
-  const innerCode = generator.statementToCode(block, 'DO');
-  const eventBlock = block.getInputTargetBlock("EVENT");
-  let argsString = eventBlock?.genEventRags.map(x => "event_"+x[0]).join(", ") || "";
-
-  block.eventArgsList = eventBlock?.genEventRags || [];
-  if (block.lastEventArgs == null) {
-    block.lastEventArgs = [];
-    block.connectedEventArgs = [];
-  }
-
-  //handle new block creation
-  block.lastEventArgs.forEach((x,i) => {
-    let argBlock = block.getInputTargetBlock("ARG"+(i+1));
-    if (argBlock != null) return;
-    
-    var InputBlock = Workspace.newBlock('event_arg_placeholder');
-    InputBlock.setFieldValue(x[0], "PLACEHOLDER");
-    InputBlock.eventArgOutput = x;
-    InputBlock.setOutput(x[1]);
-    InputBlock.initSvg();
-    InputBlock.render();
-    let inputField = block.getInput('ARG'+(i+1));
-    inputField.connection.connect(InputBlock.outputConnection);
-    block.connectedEventArgs.push(InputBlock);
-  });
-
-  //handle event change and remove references
-  if (block.lastEventArgs !== block.eventArgsList) {
-
-    block.connectedEventArgs.forEach(x => x.dispose(true));
-    block.connectedEventArgs = [];
-    block.lastEventArgs.forEach((x,i) => {
-      //remove variable and its children
-      block.removeInput("ARG"+(i+1));
-    });
-
-    block.lastEventArgs = block.eventArgsList;
-    for (let index = 0; index < block.eventArgsList.length; index++) {
-      const element = block.eventArgsList[index];
-      
-      var InputBlock = Workspace.newBlock('event_arg_placeholder');
-      InputBlock.setFieldValue(element[0], "PLACEHOLDER");
-      InputBlock.eventArgOutput = element;
-      InputBlock.setOutput(element[1]);
-      InputBlock.initSvg();
-      InputBlock.render();
-      let inputField = block.appendValueInput('ARG'+(index+1));
-      if (index == 0) {
-        inputField.appendField('Outputs:')
-      }
-      inputField.connection.connect(InputBlock.outputConnection);
-      block.connectedEventArgs.push(InputBlock);
-      block.moveInputBefore('ARG'+(index+1), "DO");
-    }
-  }
-
-  var code = `client.on(${value_event}, async(${argsString}) => {\n${innerCode}\n});\n`;
-  return code;
-};
+javascript.javascriptGenerator.forBlock['once'] = eventListenerBlocks;
+javascript.javascriptGenerator.forBlock['when'] = eventListenerBlocks;
 javascript.javascriptGenerator.forBlock['event_arg_placeholder'] = function(block, generator) {
-  var code = `event_${block.eventArgOutput[0]}`;
+  var code = `event_${to_snake_case(block.eventArgOutput[0])}`;
   return [code, javascript.Order.NONE];
 };
 
@@ -302,9 +244,9 @@ javascript.javascriptGenerator.forBlock['botready'] = function(block, generator)
 javascript.javascriptGenerator.forBlock['channel_event'] = jsEventConverter("Channel");
 javascript.javascriptGenerator.forBlock['guild_emoji_event'] = jsEventConverter("GuildEmoji");
 javascript.javascriptGenerator.forBlock['message_event'] = jsEventConverter("Message", {
-  CREATE: [["message", "Message"]],
-  UPDATE: [["old_message", "Message"], ["new_message", "Message"]],
-  DELETE: [["message", "Message"]],
+  CREATE: [["Message", "Message"]],
+  UPDATE: [["Old Message", "Message"], ["New Message", "Message"]],
+  DELETE: [["Message", "Message"]],
 });
 javascript.javascriptGenerator.forBlock['message_reaction_event'] = jsEventConverter("MessageReaction");
 javascript.javascriptGenerator.forBlock['guild_event'] = jsEventConverter("Guild");
@@ -359,7 +301,6 @@ function jsEventConverter (eventPrefix, args = {}, replaceValues) {
   return function(block, generator) {
     var dropdown_name = block.getFieldValue('EVENT');
     if (replaceValues) dropdown_name = replaceValues[dropdown_name] || dropdown_name;
-    console.log(dropdown_name);
     var eventName = eventPrefix + toPascalCase(dropdown_name);
     var code = 'Discord.Events.'+eventName;
     block.genEventRags = args[dropdown_name] || [];
@@ -377,14 +318,4 @@ function toPascalCase(text) {
   .join("");
 
   return modifiedText;
-}
-
-function undoCases(text) {
-  if (typeof text !== "string") return text;
-  if (text.includes(" ")) return text;
-  if (text.includes("_")) return text.replaceAll(/_/g, " ");
-  if (text.includes("-")) return text.replaceAll(/-/g, " ");
-  const regexCapitalized = /([a-z])([A-Z])/g;
-  if (regexCapitalized.test(text)) return text.replace(regexCapitalized, "$1 $2");
-  return text;
 }

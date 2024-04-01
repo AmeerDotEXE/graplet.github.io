@@ -22,7 +22,7 @@ python.pythonGenerator.forBlock['terminal_log'] = function(block, generator) {
 // ACTIONS
   
 python.pythonGenerator.forBlock['bot_login'] = function(block, generator) {
-  var token = generator.valueToCode(block, 'TOKEN_INPUT', javascript.Order.ATOMIC);
+  var token = generator.valueToCode(block, 'TOKEN_INPUT', python.Order.ATOMIC);
   var code = `client.run${token}`;
   return code;
 };
@@ -30,16 +30,16 @@ python.pythonGenerator.forBlock['bot_login'] = function(block, generator) {
 python.pythonGenerator.forBlock['reaction_action'] = function(block, generator) {
   var action = block.getFieldValue('TYPE');
   var reaction = generator.valueToCode(block, 'REACTION', python.Order.ATOMIC);
-  var message = generator.valueToCode(block, 'MESSAGE', python.Order.ATOMIC);
+  var message = generator.valueToCode(block, 'MESSAGE', python.Order.NONE);
   switch(action){
     case 'ADD':
-      code = `await ${message}.add_reaction${reaction}`;
+      code = `await ${message}.add_reaction${reaction}\n`;
       break;
     case 'REMOVE':
-      code = `await ${message}.clear_reaction${reaction}`;
+      code = `await ${message}.clear_reaction${reaction}\n`;
       break;
     case 'REMOVE_ALL':
-      code = `await ${message}.clear_reactions()`
+      code = `await ${message}.clear_reactions()\n`;
   }
   return code;
 };
@@ -49,14 +49,14 @@ python.pythonGenerator.forBlock['response_reply'] = function(block, generator) {
   var status = block.getFieldValue('STATUS');
   var message = generator.valueToCode(block, 'MESSAGE', python.Order.NONE);
   var content = generator.valueToCode(block, 'CONTENT', python.Order.ATOMIC);
-  var code = `await ${message}.reply(${content})`;
+  var code = `await ${message}.reply${content}\n`;
   return code;
 };
 
 python.pythonGenerator.forBlock['bulk_delete'] = function(block, generator) {
   var channel = generator.valueToCode(block, 'CHANNEL', python.Order.NONE);
   var amount = generator.valueToCode(block, 'AMOUNT', python.Order.ATOMIC);
-  var code = `await ${channel}.purge(limit=${amount})`;
+  var code = `await ${channel}.purge(limit=${amount})\n`;
   return code;
 };
 
@@ -80,7 +80,7 @@ python.pythonGenerator.forBlock['channel_action'] = function(block, generator) {
     case 'DELETE':
       code = `await ${delete_channel}.delete()`
   }
-  return code;
+  return code+"\n";
 };
 
 python.pythonGenerator.forBlock['message_action'] = function(block, generator) {
@@ -91,13 +91,13 @@ python.pythonGenerator.forBlock['message_action'] = function(block, generator) {
   var message = generator.valueToCode(block, 'CONTENT', python.Order.ATOMIC);
   switch(action){
     case 'SEND':
-      code = `await ${channel}.send${message}`
+      code = `await ${channel}.send${message}\n`
       break;
     case 'EDIT':
-      code = `await ${edit_msg}.edit${message}`
+      code = `await ${edit_msg}.edit${message}\n`
       break;
     case 'DELETE':
-      code = `await ${delete_msg}.delete()`
+      code = `await ${delete_msg}.delete()\n`
   }
   return code;
 };
@@ -119,13 +119,13 @@ python.pythonGenerator.forBlock['role_action'] = function(block, generator) {
       code = `await ${role}.delete()`
   }
 
-  return code;
+  return code+"\n";
 };
 
 python.pythonGenerator.forBlock['change_guild_name'] = function(block, generator) {
   var new_name = generator.valueToCode(block, 'NAME', python.Order.ATOMIC);
   var guild = generator.valueToCode(block, 'GUILD', python.Order.NONE);
-  var code = `await ${guild}.edit${new_name}`;
+  var code = `await ${guild}.edit${new_name}\n`;
   return code;
 };
 
@@ -144,20 +144,6 @@ python.pythonGenerator.forBlock['get_by_id'] = function(block, generator) {
 
 // EVENTS
 
-function pyEventConverter(eventPrefix,manualCycle) {
-  return function(block, generator) {
-    const field = block.getField('EVENT')
-    const cycleIndex = parseInt(field.menuGenerator_.map(option => option[1]).indexOf(field.selectedOption[1]));
-    var name = block.getFieldValue('EVENT');
-    if (manualCycle != undefined && manualCycle[cycleIndex] != null){
-      var code = 'on_' + eventPrefix + manualCycle[cycleIndex] + '():'
-    }else{
-      var code = 'on_'+eventPrefix + '_' + name.toLowerCase() + '():';
-    }
-    return [code, python.Order.NONE];
-  };
-}
-
 python.pythonGenerator.forBlock['once'] = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', python.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
@@ -168,27 +154,90 @@ python.pythonGenerator.forBlock['once'] = function(block, generator) {
 python.pythonGenerator.forBlock['when'] = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', python.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `@client.event\nasync def ${value_event}\n${innerCode}\n`;
+  const eventBlock = block.getInputTargetBlock("EVENT");
+  let argsString = eventBlock?.genEventRags.map(x => "event_"+to_snake_case(x[0])).join(", ") || "";
+
+  block.eventArgsList = eventBlock?.genEventRags || [];
+  if (block.lastEventArgs == null) {
+    block.lastEventArgs = [];
+    block.connectedEventArgs = [];
+  }
+
+  //handle new block creation
+  block.lastEventArgs.forEach((x,i) => {
+    let argBlock = block.getInputTargetBlock("ARG"+(i+1));
+    if (argBlock != null) return;
+    
+    var InputBlock = Workspace.newBlock('event_arg_placeholder');
+    InputBlock.setFieldValue(x[0], "PLACEHOLDER");
+    InputBlock.eventArgOutput = x;
+    InputBlock.setOutput(x[1]);
+    InputBlock.initSvg();
+    InputBlock.render();
+    let inputField = block.getInput('ARG'+(i+1));
+    inputField.connection.connect(InputBlock.outputConnection);
+    block.connectedEventArgs.push(InputBlock);
+  });
+
+  //handle event change and remove references
+  if (block.lastEventArgs !== block.eventArgsList) {
+
+    //remove variable and its copies
+    block.connectedEventArgs.forEach(x => x.dispose(true));
+    block.connectedEventArgs = [];
+    block.lastEventArgs.forEach((x,i) => {
+      block.removeInput("ARG"+(i+1));
+    });
+
+    block.lastEventArgs = block.eventArgsList;
+    for (let index = 0; index < block.eventArgsList.length; index++) {
+      const element = block.eventArgsList[index];
+      
+      var InputBlock = Workspace.newBlock('event_arg_placeholder');
+      InputBlock.setFieldValue(element[0], "PLACEHOLDER");
+      InputBlock.eventArgOutput = element;
+      InputBlock.setOutput(element[1]);
+      InputBlock.initSvg();
+      InputBlock.render();
+      let inputField = block.appendValueInput('ARG'+(index+1));
+      if (index == 0) {
+        inputField.appendField('Outputs:');
+      }
+      inputField.connection.connect(InputBlock.outputConnection);
+      block.connectedEventArgs.push(InputBlock);
+      block.moveInputBefore('ARG'+(index+1), "DO");
+    }
+  }
+
+  var code = `@client.event\nasync def ${value_event}(${argsString}):\n${innerCode}\n`;
   return code;
+};
+python.pythonGenerator.forBlock['event_arg_placeholder'] = function(block, generator) {
+  var code = `event_${to_snake_case(block.eventArgOutput[0])}`;
+  return [code, python.Order.NONE];
 };
 
 // EVENT BOOLS
 
 python.pythonGenerator.forBlock['channel_event'] = pyEventConverter('guild_channel')
-python.pythonGenerator.forBlock['message_event'] = pyEventConverter('message',['',null,null])
-python.pythonGenerator.forBlock['message_reaction_event'] = pyEventConverter('reaction',[null,null,'_clear'])
+python.pythonGenerator.forBlock['message_event'] = pyEventConverter('message', {
+  "CREATE": [["Message", "Message"]],
+  "UPDATE": [["Old Message", "Message"], ["New Message", "Message"]],
+  "DELETE": [["Message", "Message"]],
+},['',null,null])
+python.pythonGenerator.forBlock['message_reaction_event'] = pyEventConverter('reaction', {},[null,null,'_clear'])
 python.pythonGenerator.forBlock['bot_guild_event'] = pyEventConverter('guild')
 python.pythonGenerator.forBlock['guild_event'] = pyEventConverter('guild')
-python.pythonGenerator.forBlock['guild_emoji_event'] = pyEventConverter('guild_emojis',['_update',null,'_update'])
-python.pythonGenerator.forBlock['guild_sticker_event'] = pyEventConverter('guild_stickers',['_update',null,'_update'])
-python.pythonGenerator.forBlock['guild_member_event'] = pyEventConverter('member',['_join',null,null])
+python.pythonGenerator.forBlock['guild_emoji_event'] = pyEventConverter('guild_emojis', {},['_update',null,'_update'])
+python.pythonGenerator.forBlock['guild_sticker_event'] = pyEventConverter('guild_stickers', {},['_update',null,'_update'])
+python.pythonGenerator.forBlock['guild_member_event'] = pyEventConverter('member', {},['_join',null,null])
 python.pythonGenerator.forBlock['guild_member_moderate_event'] = pyEventConverter('member')
 python.pythonGenerator.forBlock['guild_role_event'] = pyEventConverter('guild_role')
 python.pythonGenerator.forBlock['guild_scheduled_event_event'] = pyEventConverter('scheduled_event')
 
 
 python.pythonGenerator.forBlock['botready'] = function(block, generator) {
-  var code = 'on_ready():';
+  var code = 'on_ready';
   return [code, python.Order.NONE];
 };
 
@@ -224,3 +273,20 @@ python.pythonGenerator.forBlock['token_input'] = function(block, generator) {
   var token = block.getFieldValue('TOKEN');
   return [`"${token}"`, python.Order.NONE];
 };
+
+
+
+function pyEventConverter(eventPrefix, args = {},manualCycle) {
+  return function(block, generator) {
+    const field = block.getField('EVENT')
+    const cycleIndex = parseInt(field.menuGenerator_.map(option => option[1]).indexOf(field.selectedOption[1]));
+    var name = block.getFieldValue('EVENT');
+    if (manualCycle != undefined && manualCycle[cycleIndex] != null){
+      var code = 'on_' + eventPrefix + manualCycle[cycleIndex];
+    }else{
+      var code = 'on_'+eventPrefix + '_' + name.toLowerCase();
+    }
+    block.genEventRags = args[name] || [];
+    return [code, python.Order.NONE];
+  };
+}
