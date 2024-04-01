@@ -654,7 +654,10 @@ Blockly.Blocks['get_by_id'] = {
     this.appendDummyInput()
       .appendField('get')
       .appendField(new Blockly.FieldDropdown(options,this.validate), 'INSTANCES')
+    console.log(this)
     this.updateConnections('GUILD')
+
+    /* BUG HERE GET_BY_ID */
   },
   updateConnections: function(newValue){
     this.setOutput(true,capitalizeFirstLetter(newValue.toLowerCase()));
