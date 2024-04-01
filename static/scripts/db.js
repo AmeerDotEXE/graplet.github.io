@@ -18,6 +18,7 @@ function openDatabase() {
       const ProjectStore = db.createObjectStore("projects", {keyPath: 'id', autoIncrement: true });
       const SettingsStore = db.createObjectStore("settings");
       ProjectStore.createIndex("name", "name", { unique: true });
+      SettingsStore.createIndex("cache","cache")
       SettingsStore.createIndex("theme","theme")
     };
   });
