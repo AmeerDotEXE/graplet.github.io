@@ -14,7 +14,7 @@ javascript.javascriptGenerator.forBlock['colour_hsv_sliders'] = function (block,
   return [code, javascript.Order.ATOMIC];
 };
 
-javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
+javascript.javascriptGenerator.forBlock['terminal_log'] = function(block, generator) {
   const LOG = generator.valueToCode(block, 'LOG', javascript.Order.NONE);
   return `console.log(${LOG});\n`};
   
@@ -26,8 +26,8 @@ javascript.javascriptGenerator.forBlock['bot_login'] = function(block, generator
   return code;
 };
 
-javascript.javascriptGenerator.forBlock['add_reaction'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
+javascript.javascriptGenerator.forBlock['reaction_action'] = function(block, generator) {
+  var dropdown_action = block.getFieldValue('TYPE');
   var value_reaction = generator.valueToCode(block, 'REACTION', javascript.Order.ATOMIC);
   var value_message = generator.valueToCode(block, 'MESSAGE', javascript.Order.ATOMIC);
 
@@ -124,13 +124,6 @@ javascript.javascriptGenerator.forBlock['role_action'] = function(block, generat
     code = `await ${action_guild}.roles.create({ name: ${action_name}, color: ${action_color} });\n`;
   }
 
-  return code;
-};
-
-javascript.javascriptGenerator.forBlock['user_action'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
   return code;
 };
 
@@ -302,21 +295,20 @@ javascript.javascriptGenerator.forBlock['botready'] = function(block, generator)
   return [code, javascript.Order.NONE];
 };
 
-javascript.javascriptGenerator.forBlock['channel_event'] = jsEventConverter ("Channel");
-javascript.javascriptGenerator.forBlock['emoji_event'] = jsEventConverter ("Emoji");
-javascript.javascriptGenerator.forBlock['message_event'] = jsEventConverter ("Message", {
+javascript.javascriptGenerator.forBlock['channel_event'] = eventConverter("Channel");
+javascript.javascriptGenerator.forBlock['message_event'] = eventConverter("Message", {
   CREATE: [["message", "Message"]],
   UPDATE: [["old_message", "Message"], ["new_message", "Message"]],
   DELETE: [["message", "Message"]],
 });
-javascript.javascriptGenerator.forBlock['message_reaction_event'] = jsEventConverter ("MessageReaction");
-javascript.javascriptGenerator.forBlock['guild_event'] = jsEventConverter ("Guild");
-javascript.javascriptGenerator.forBlock['guild_emoji_event'] = jsEventConverter ("GuildEmoji");
-javascript.javascriptGenerator.forBlock['guild_sticker_event'] = jsEventConverter ("GuildSticker");
-javascript.javascriptGenerator.forBlock['guild_member_event'] = jsEventConverter ("GuildMember");
-javascript.javascriptGenerator.forBlock['guild_role_event'] = jsEventConverter ("GuildRole");
-javascript.javascriptGenerator.forBlock['guild_scheduled_event_event'] = jsEventConverter ("GuildScheduledEvent");
+javascript.javascriptGenerator.forBlock['message_reaction_event'] = eventConverter("MessageReaction");
+javascript.javascriptGenerator.forBlock['guild_event'] = eventConverter("Guild");
+javascript.javascriptGenerator.forBlock['guild_sticker_event'] = eventConverter("GuildSticker");
+javascript.javascriptGenerator.forBlock['guild_member_event'] = eventConverter("GuildMember");
+javascript.javascriptGenerator.forBlock['guild_role_event'] = eventConverter("GuildRole");
+javascript.javascriptGenerator.forBlock['guild_scheduled_event_event'] = eventConverter("GuildScheduledEvent");
 
+// MERGE TODO: MAKE GEN FOR 2 NEW BLOCKS: BOT_GUILD_EVENT, GUILD_MEMBER_MODERATE_EVENT ||   Ps: i removed the guildemoji event 
 
 // INSTANCES
 
@@ -357,7 +349,7 @@ javascript.javascriptGenerator.forBlock['token_input'] = function(block, generat
 
 function jsEventConverter (eventPrefix, args = {}) {
   return function(block, generator) {
-    var dropdown_name = block.getFieldValue('EVENT') || block.getFieldValue('NAME');
+    var dropdown_name = block.getFieldValue('EVENT');
     var eventName = eventPrefix + toPascalCase(dropdown_name);
     var code = 'Discord.Events.'+eventName;
     block.genEventRags = args[dropdown_name] || [];
