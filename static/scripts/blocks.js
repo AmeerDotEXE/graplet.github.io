@@ -679,6 +679,16 @@ Blockly.Blocks['get_by_id'] = {
         .appendField(`of channel`)
         .setCheck('Channel')
     }
+  },
+  onchange : function(){
+    // Check if child METHOD exists -> check if empty
+    const valueInput = this.getInput('METHOD', true)
+    if (valueInput){
+      const connection = valueInput.connection.targetConnection
+      if (connection){
+        console.log(connection)
+      }
+    }
   }
 }
 
@@ -863,3 +873,8 @@ var roleActions = generateActionBlock('role',[
   }
 });
   
+
+
+Blockly.Blocks['channel_action'] = channelActions
+Blockly.Blocks['message_action'] = messageActions
+Blockly.Blocks['role_action'] = roleActions
