@@ -169,34 +169,153 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
 javascript.javascriptGenerator.forBlock['once'] = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `client.once(${value_event}, async() => {\n${innerCode}\n});\n`;
+  const eventBlock = block.getInputTargetBlock("EVENT");
+  let argsString = eventBlock?.genEventRags.map(x => "_event_"+x[0]).join(", ") || "";
+
+  block.eventArgsList = eventBlock?.genEventRags || [];
+  if (block.lastEventArgs == null) {
+    block.lastEventArgs = [];
+    block.connectedEventArgs = [];
+  }
+
+  //handle new block creation
+  block.lastEventArgs.forEach((x,i) => {
+    let argBlock = block.getInputTargetBlock("ARG"+(i+1));
+    if (argBlock != null) return;
+    
+    var InputBlock = Workspace.newBlock('event_arg_placeholder');
+    InputBlock.setFieldValue(x[0], "PLACEHOLDER");
+    InputBlock.eventArgOutput = x;
+    InputBlock.setOutput(x[1]);
+    InputBlock.initSvg();
+    InputBlock.render();
+    let inputField = block.getInput('ARG'+(i+1));
+    inputField.connection.connect(InputBlock.outputConnection);
+    block.connectedEventArgs.push(InputBlock);
+  });
+
+  //handle event change and remove references
+  if (block.lastEventArgs !== block.eventArgsList) {
+
+    block.connectedEventArgs.forEach(x => x.dispose(true));
+    block.connectedEventArgs = [];
+    block.lastEventArgs.forEach((x,i) => {
+      //remove variable and its children
+      block.removeInput("ARG"+(i+1));
+    });
+
+    block.lastEventArgs = block.eventArgsList;
+    for (let index = 0; index < block.eventArgsList.length; index++) {
+      const element = block.eventArgsList[index];
+      
+      var InputBlock = Workspace.newBlock('event_arg_placeholder');
+      InputBlock.setFieldValue(element[0], "PLACEHOLDER");
+      InputBlock.eventArgOutput = element;
+      InputBlock.setOutput(element[1]);
+      InputBlock.initSvg();
+      InputBlock.render();
+      let inputField = block.appendValueInput('ARG'+(index+1));
+      if (index == 0) {
+        inputField.appendField('Outputs:')
+      }
+      inputField.connection.connect(InputBlock.outputConnection);
+      block.connectedEventArgs.push(InputBlock);
+      block.moveInputBefore('ARG'+(index+1), "DO");
+    }
+  }
+
+  var code = `client.once(${value_event}, async(${argsString}) => {\n${innerCode}\n});\n`;
   return code;
 };
 
 javascript.javascriptGenerator.forBlock['when'] = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
-  var code = `client.on(${value_event}, async(output) => {\n${innerCode}\n});\n`;
+  const eventBlock = block.getInputTargetBlock("EVENT");
+  let argsString = eventBlock?.genEventRags.map(x => "_event_"+x[0]).join(", ") || "";
+
+  block.eventArgsList = eventBlock?.genEventRags || [];
+  if (block.lastEventArgs == null) {
+    block.lastEventArgs = [];
+    block.connectedEventArgs = [];
+  }
+
+  //handle new block creation
+  block.lastEventArgs.forEach((x,i) => {
+    let argBlock = block.getInputTargetBlock("ARG"+(i+1));
+    if (argBlock != null) return;
+    
+    var InputBlock = Workspace.newBlock('event_arg_placeholder');
+    InputBlock.setFieldValue(x[0], "PLACEHOLDER");
+    InputBlock.eventArgOutput = x;
+    InputBlock.setOutput(x[1]);
+    InputBlock.initSvg();
+    InputBlock.render();
+    let inputField = block.getInput('ARG'+(i+1));
+    inputField.connection.connect(InputBlock.outputConnection);
+    block.connectedEventArgs.push(InputBlock);
+  });
+
+  //handle event change and remove references
+  if (block.lastEventArgs !== block.eventArgsList) {
+
+    block.connectedEventArgs.forEach(x => x.dispose(true));
+    block.connectedEventArgs = [];
+    block.lastEventArgs.forEach((x,i) => {
+      //remove variable and its children
+      block.removeInput("ARG"+(i+1));
+    });
+
+    block.lastEventArgs = block.eventArgsList;
+    for (let index = 0; index < block.eventArgsList.length; index++) {
+      const element = block.eventArgsList[index];
+      
+      var InputBlock = Workspace.newBlock('event_arg_placeholder');
+      InputBlock.setFieldValue(element[0], "PLACEHOLDER");
+      InputBlock.eventArgOutput = element;
+      InputBlock.setOutput(element[1]);
+      InputBlock.initSvg();
+      InputBlock.render();
+      let inputField = block.appendValueInput('ARG'+(index+1));
+      if (index == 0) {
+        inputField.appendField('Outputs:')
+      }
+      inputField.connection.connect(InputBlock.outputConnection);
+      block.connectedEventArgs.push(InputBlock);
+      block.moveInputBefore('ARG'+(index+1), "DO");
+    }
+  }
+
+  var code = `client.on(${value_event}, async(${argsString}) => {\n${innerCode}\n});\n`;
   return code;
+};
+javascript.javascriptGenerator.forBlock['event_arg_placeholder'] = function(block, generator) {
+  var code = `_event_${block.eventArgOutput[0]}`;
+  return [code, javascript.Order.NONE];
 };
 
 // EVENT BOOLS
 
 javascript.javascriptGenerator.forBlock['botready'] = function(block, generator) {
   var code = 'Discord.Events.ClientReady';
+  block.genEventRags = [];
   return [code, javascript.Order.NONE];
 };
 
-javascript.javascriptGenerator.forBlock['channel_event'] = eventConverter("Channel");
-javascript.javascriptGenerator.forBlock['emoji_event'] = eventConverter("Emoji");
-javascript.javascriptGenerator.forBlock['message_event'] = eventConverter("Message");
-javascript.javascriptGenerator.forBlock['message_reaction_event'] = eventConverter("MessageReaction");
-javascript.javascriptGenerator.forBlock['guild_event'] = eventConverter("Guild");
-javascript.javascriptGenerator.forBlock['guild_emoji_event'] = eventConverter("GuildEmoji");
-javascript.javascriptGenerator.forBlock['guild_sticker_event'] = eventConverter("GuildSticker");
-javascript.javascriptGenerator.forBlock['guild_member_event'] = eventConverter("GuildMember");
-javascript.javascriptGenerator.forBlock['guild_role_event'] = eventConverter("GuildRole");
-javascript.javascriptGenerator.forBlock['guild_scheduled_event_event'] = eventConverter("GuildScheduledEvent");
+javascript.javascriptGenerator.forBlock['channel_event'] = jsEventConverter ("Channel");
+javascript.javascriptGenerator.forBlock['emoji_event'] = jsEventConverter ("Emoji");
+javascript.javascriptGenerator.forBlock['message_event'] = jsEventConverter ("Message", {
+  CREATE: [["message", "Message"]],
+  UPDATE: [["old_message", "Message"], ["new_message", "Message"]],
+  DELETE: [["message", "Message"]],
+});
+javascript.javascriptGenerator.forBlock['message_reaction_event'] = jsEventConverter ("MessageReaction");
+javascript.javascriptGenerator.forBlock['guild_event'] = jsEventConverter ("Guild");
+javascript.javascriptGenerator.forBlock['guild_emoji_event'] = jsEventConverter ("GuildEmoji");
+javascript.javascriptGenerator.forBlock['guild_sticker_event'] = jsEventConverter ("GuildSticker");
+javascript.javascriptGenerator.forBlock['guild_member_event'] = jsEventConverter ("GuildMember");
+javascript.javascriptGenerator.forBlock['guild_role_event'] = jsEventConverter ("GuildRole");
+javascript.javascriptGenerator.forBlock['guild_scheduled_event_event'] = jsEventConverter ("GuildScheduledEvent");
 
 
 // INSTANCES
@@ -236,11 +355,12 @@ javascript.javascriptGenerator.forBlock['token_input'] = function(block, generat
 
 
 
-function eventConverter(eventPrefix) {
+function jsEventConverter (eventPrefix, args = {}) {
   return function(block, generator) {
     var dropdown_name = block.getFieldValue('EVENT') || block.getFieldValue('NAME');
     var eventName = eventPrefix + toPascalCase(dropdown_name);
     var code = 'Discord.Events.'+eventName;
+    block.genEventRags = args[dropdown_name] || [];
     return [code, javascript.Order.NONE];
   };
 }
