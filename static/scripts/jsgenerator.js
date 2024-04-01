@@ -243,11 +243,7 @@ javascript.javascriptGenerator.forBlock['botready'] = function(block, generator)
 
 javascript.javascriptGenerator.forBlock['channel_event'] = jsEventConverter("Channel");
 javascript.javascriptGenerator.forBlock['guild_emoji_event'] = jsEventConverter("GuildEmoji");
-javascript.javascriptGenerator.forBlock['message_event'] = jsEventConverter("Message", {
-  CREATE: [["Message", "Message"]],
-  UPDATE: [["Old Message", "Message"], ["New Message", "Message"]],
-  DELETE: [["Message", "Message"]],
-});
+javascript.javascriptGenerator.forBlock['message_event'] = jsEventConverter("Message");
 javascript.javascriptGenerator.forBlock['message_reaction_event'] = jsEventConverter("MessageReaction");
 javascript.javascriptGenerator.forBlock['guild_event'] = jsEventConverter("Guild");
 javascript.javascriptGenerator.forBlock['guild_sticker_event'] = jsEventConverter("GuildSticker");
@@ -256,8 +252,8 @@ javascript.javascriptGenerator.forBlock['guild_member_moderate_event'] = jsEvent
 javascript.javascriptGenerator.forBlock['guild_role_event'] = jsEventConverter("GuildRole");
 javascript.javascriptGenerator.forBlock['guild_scheduled_event_event'] = jsEventConverter("GuildScheduledEvent");
 javascript.javascriptGenerator.forBlock['bot_guild_event'] = jsEventConverter("Guild", {
-  CREATE: [["server", "Guild"]],
-  DELETE: [["server", "Guild"]],
+  JOIN: [["Server", "Guild"]],
+  REMOVE: [["Server", "Guild"]],
 }, {"JOIN":"CREATE","REMOVE":"DELETE"});
 
 // INSTANCES
@@ -300,10 +296,10 @@ javascript.javascriptGenerator.forBlock['token_input'] = function(block, generat
 function jsEventConverter (eventPrefix, args = {}, replaceValues) {
   return function(block, generator) {
     var dropdown_name = block.getFieldValue('EVENT');
+    block.genEventRags = args[dropdown_name] || globalEventArguments[block.type]?.[dropdown_name] || [];
     if (replaceValues) dropdown_name = replaceValues[dropdown_name] || dropdown_name;
     var eventName = eventPrefix + toPascalCase(dropdown_name);
     var code = 'Discord.Events.'+eventName;
-    block.genEventRags = args[dropdown_name] || [];
     return [code, javascript.Order.NONE];
   };
 }

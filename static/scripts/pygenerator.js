@@ -220,13 +220,12 @@ python.pythonGenerator.forBlock['event_arg_placeholder'] = function(block, gener
 // EVENT BOOLS
 
 python.pythonGenerator.forBlock['channel_event'] = pyEventConverter('guild_channel')
-python.pythonGenerator.forBlock['message_event'] = pyEventConverter('message', {
-  "CREATE": [["Message", "Message"]],
-  "UPDATE": [["Old Message", "Message"], ["New Message", "Message"]],
-  "DELETE": [["Message", "Message"]],
-},['',null,null])
+python.pythonGenerator.forBlock['message_event'] = pyEventConverter('message', {},['',null,null])
 python.pythonGenerator.forBlock['message_reaction_event'] = pyEventConverter('reaction', {},[null,null,'_clear'])
-python.pythonGenerator.forBlock['bot_guild_event'] = pyEventConverter('guild')
+python.pythonGenerator.forBlock['bot_guild_event'] = pyEventConverter('guild',{
+  JOIN: [["Server", "Guild"]],
+  REMOVE: [["Server", "Guild"]],
+})
 python.pythonGenerator.forBlock['guild_event'] = pyEventConverter('guild')
 python.pythonGenerator.forBlock['guild_emoji_event'] = pyEventConverter('guild_emojis', {},['_update',null,'_update'])
 python.pythonGenerator.forBlock['guild_sticker_event'] = pyEventConverter('guild_stickers', {},['_update',null,'_update'])
@@ -286,7 +285,7 @@ function pyEventConverter(eventPrefix, args = {},manualCycle) {
     }else{
       var code = 'on_'+eventPrefix + '_' + name.toLowerCase();
     }
-    block.genEventRags = args[name] || [];
+    block.genEventRags = args[name] || globalEventArguments[block.type]?.[name] || [];
     return [code, python.Order.NONE];
   };
 }

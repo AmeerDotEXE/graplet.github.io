@@ -898,6 +898,15 @@ Blockly.Blocks['message_action'] = messageActions
 Blockly.Blocks['role_action'] = roleActions
 
 
+let globalEventArguments = {
+  message_event: {
+    CREATE: [["Message", "Message"]],
+    UPDATE: [["Old Message", "Message"], ["New Message", "Message"]],
+    DELETE: [["Message", "Message"]],
+  },
+};
+
+
 
 function to_snake_case(text) {
   const originalText = text;
