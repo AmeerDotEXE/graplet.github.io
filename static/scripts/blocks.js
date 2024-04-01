@@ -896,3 +896,34 @@ var roleActions = generateActionBlock('role',[
 Blockly.Blocks['channel_action'] = channelActions
 Blockly.Blocks['message_action'] = messageActions
 Blockly.Blocks['role_action'] = roleActions
+
+
+let globalEventArguments = {
+  message_event: {
+    CREATE: [["Message", "Message"]],
+    UPDATE: [["Old Message", "Message"], ["New Message", "Message"]],
+    DELETE: [["Message", "Message"]],
+  },
+};
+
+
+
+function to_snake_case(text) {
+  const originalText = text;
+  let unmodifiedText = undoCases(originalText);
+  let modifiedText = unmodifiedText;
+
+  modifiedText = unmodifiedText.toLowerCase().split(" ").join("_");
+
+  return modifiedText;
+}
+
+function undoCases(text) {
+  if (typeof text !== "string") return text;
+  if (text.includes(" ")) return text;
+  if (text.includes("_")) return text.replaceAll(/_/g, " ");
+  if (text.includes("-")) return text.replaceAll(/-/g, " ");
+  const regexCapitalized = /([a-z])([A-Z])/g;
+  if (regexCapitalized.test(text)) return text.replace(regexCapitalized, "$1 $2");
+  return text;
+}
