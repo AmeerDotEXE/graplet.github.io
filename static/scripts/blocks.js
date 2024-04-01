@@ -580,6 +580,21 @@ Blockly.defineBlocksWithJsonArray([
   "tooltip": "Represents a boolean value indicating whether an action related to message reaction has occurred.",
   "helpUrl": ""
 },
+{
+  "type": "event_arg_placeholder",
+  "message0": "%1",
+  "args0": [
+    {
+      "type": "field_label_serializable",
+      "name": "PLACEHOLDER",
+      "text": ""
+    }
+  ],
+  "output": null,
+  "colour": 230,
+  "tooltip": "",
+  "helpUrl": ""
+}
 ])
 
 
