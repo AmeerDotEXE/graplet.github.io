@@ -171,7 +171,7 @@ python.pythonGenerator.forBlock['when'] = function(block, generator) {
     var InputBlock = Workspace.newBlock('event_arg_placeholder');
     InputBlock.setFieldValue(x[0], "PLACEHOLDER");
     InputBlock.eventArgOutput = x;
-    InputBlock.setOutput(x[1]);
+    InputBlock.setOutput(true,x[1]);
     InputBlock.initSvg();
     InputBlock.render();
     let inputField = block.getInput('ARG'+(i+1));
@@ -196,7 +196,7 @@ python.pythonGenerator.forBlock['when'] = function(block, generator) {
       var InputBlock = Workspace.newBlock('event_arg_placeholder');
       InputBlock.setFieldValue(element[0], "PLACEHOLDER");
       InputBlock.eventArgOutput = element;
-      InputBlock.setOutput(element[1]);
+      InputBlock.setOutput(true,element[1]);
       InputBlock.initSvg();
       InputBlock.render();
       let inputField = block.appendValueInput('ARG'+(index+1));

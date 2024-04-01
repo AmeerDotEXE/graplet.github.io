@@ -670,11 +670,14 @@ Blockly.Blocks['get_by_id'] = {
       .appendField('get')
       .appendField(new Blockly.FieldDropdown(options,this.validate), 'INSTANCES')
     console.log(this)
+    this.notFirstTimeLoading = false;
     this.updateConnections('GUILD')
-
-    /* BUG HERE GET_BY_ID */
   },
   updateConnections: function(newValue){
+    if (this.notFirstTimeLoading == true) {
+      this.setOutput(true,capitalizeFirstLetter(newValue.toLowerCase()));
+    }
+    this.notFirstTimeLoading = true;
     this.setOutput(true,capitalizeFirstLetter(newValue.toLowerCase()));
     this.removeInput('ID_INPUT',true)
     this.removeInput('METHOD',true)
