@@ -13,17 +13,16 @@ const graplet_theme = Blockly.Theme.defineTheme('graplet', {
   'startHats': true,
 });
 
-djsInstanceDict = {
-  'Client' : ['Guilds','User','Channels','Shard'],
-
+const propertyDict = {
+ /* Propety dict via Check */
 }
 
 Blockly.Extensions.register('dynamic_property_of', function() {
   this.getInput('VALUE_CHILD').appendField(new Blockly.FieldDropdown(function() {
     var options = [['...', 'NONE']];
     var child = this.getChildren()[0];
-    if (child && djsInstanceDict[child.outputConnection.check]) {
-      options = options.concat(djsInstanceDict[child.outputConnection.check].map(function(property) {
+    if (child && propertyDict[child.outputConnection.check]) {
+      options = options.concat(propertyDict[child.outputConnection.check].map(function(property) {
         return [property,property.toUpperCase()];
       }));
     }
