@@ -224,8 +224,9 @@ var toolbox = {
             text: 'Instances'
           },
           {
-            'type': 'property_of',
-            'kind': 'block',
+            type: 'property_of',
+            kind: 'block',
+            disabled: true
           },
           {
             type: 'field_date',
