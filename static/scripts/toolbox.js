@@ -125,7 +125,7 @@ var toolbox = {
             }
           },
           {
-            type: 'add_reaction',
+            type: 'reaction_action',
             kind: 'block',
             inputs: {
               REACTION: {
@@ -168,11 +168,11 @@ var toolbox = {
             'kind': 'block',
           },
           {
-            'type': 'channel_event',
-            'kind': 'block',
+            'type': 'bot_guild_event',
+            'kind' : 'block'
           },
           {
-            'type': 'emoji_event',
+            'type': 'channel_event',
             'kind': 'block',
           },
           {
@@ -197,6 +197,10 @@ var toolbox = {
           },
           {
             'type': 'guild_member_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'guild_member_moderate_event',
             'kind': 'block',
           },
           {
@@ -230,6 +234,7 @@ var toolbox = {
           {
             type: 'embed_builder',
             kind: 'block',
+            disabled: true,
             extraState :{
               "embedOptions" : ['DESCRIPTION'],
             },
@@ -608,7 +613,7 @@ var toolbox = {
             text: 'Text'
           },
           {
-            type: 'console_log',
+            type: 'terminal_log',
             kind: 'block',
             inputs: {
               LOG: {

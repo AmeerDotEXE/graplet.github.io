@@ -14,7 +14,7 @@ javascript.javascriptGenerator.forBlock['colour_hsv_sliders'] = function (block,
   return [code, javascript.Order.ATOMIC];
 };
 
-javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
+javascript.javascriptGenerator.forBlock['terminal_log'] = function(block, generator) {
   const LOG = generator.valueToCode(block, 'LOG', javascript.Order.NONE);
   return `console.log(${LOG});\n`};
   
@@ -26,8 +26,8 @@ javascript.javascriptGenerator.forBlock['bot_login'] = function(block, generator
   return code;
 };
 
-javascript.javascriptGenerator.forBlock['add_reaction'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
+javascript.javascriptGenerator.forBlock['reaction_action'] = function(block, generator) {
+  var dropdown_action = block.getFieldValue('TYPE');
   var value_reaction = generator.valueToCode(block, 'REACTION', javascript.Order.ATOMIC);
   var value_message = generator.valueToCode(block, 'MESSAGE', javascript.Order.ATOMIC);
 
@@ -127,13 +127,6 @@ javascript.javascriptGenerator.forBlock['role_action'] = function(block, generat
   return code;
 };
 
-javascript.javascriptGenerator.forBlock['user_action'] = function(block, generator) {
-  var dropdown_action = block.getFieldValue('ACTION');
-  // TODO: Assemble javascript into code variable.
-  var code = '...\n';
-  return code;
-};
-
 javascript.javascriptGenerator.forBlock['change_guild_name'] = function(block, generator) {
   var value_guild = generator.valueToCode(block, 'GUILD', javascript.Order.NONE);
   var value_name = generator.valueToCode(block, 'NAME', javascript.Order.NONE);
@@ -188,16 +181,15 @@ javascript.javascriptGenerator.forBlock['botready'] = function(block, generator)
 };
 
 javascript.javascriptGenerator.forBlock['channel_event'] = eventConverter("Channel");
-javascript.javascriptGenerator.forBlock['emoji_event'] = eventConverter("Emoji");
 javascript.javascriptGenerator.forBlock['message_event'] = eventConverter("Message");
 javascript.javascriptGenerator.forBlock['message_reaction_event'] = eventConverter("MessageReaction");
 javascript.javascriptGenerator.forBlock['guild_event'] = eventConverter("Guild");
-javascript.javascriptGenerator.forBlock['guild_emoji_event'] = eventConverter("GuildEmoji");
 javascript.javascriptGenerator.forBlock['guild_sticker_event'] = eventConverter("GuildSticker");
 javascript.javascriptGenerator.forBlock['guild_member_event'] = eventConverter("GuildMember");
 javascript.javascriptGenerator.forBlock['guild_role_event'] = eventConverter("GuildRole");
 javascript.javascriptGenerator.forBlock['guild_scheduled_event_event'] = eventConverter("GuildScheduledEvent");
 
+// MERGE TODO: MAKE GEN FOR 2 NEW BLOCKS: BOT_GUILD_EVENT, GUILD_MEMBER_MODERATE_EVENT ||   Ps: i removed the guildemoji event 
 
 // INSTANCES
 
@@ -238,7 +230,7 @@ javascript.javascriptGenerator.forBlock['token_input'] = function(block, generat
 
 function eventConverter(eventPrefix) {
   return function(block, generator) {
-    var dropdown_name = block.getFieldValue('EVENT') || block.getFieldValue('NAME');
+    var dropdown_name = block.getFieldValue('EVENT');
     var eventName = eventPrefix + toPascalCase(dropdown_name);
     var code = 'Discord.Events.'+eventName;
     return [code, javascript.Order.NONE];

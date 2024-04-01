@@ -42,7 +42,7 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "console_log",
+  "type": "terminal_log",
   "message0": "log in console %1",
   "args0": [
     {
@@ -129,12 +129,12 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "emoji_event",
+  "type": "guild_emoji_event",
   "message0": "emoji %1",
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
       "options": [
         [
           "created",
@@ -163,7 +163,7 @@ Blockly.defineBlocksWithJsonArray([
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
       "options": [
         [
           "updated",
@@ -176,22 +176,6 @@ Blockly.defineBlocksWithJsonArray([
         [
           "unavailable",
           "UNAVAILABLE"
-        ],
-        [
-          "banned user",
-          "BAN_ADD"
-        ],
-        [
-          "unbanned user",
-          "BAN_REMOVE"
-        ],
-        [
-          "joined",
-          "CREATE"
-        ],
-        [
-          "left",
-          "DELETE"
         ]
       ]
     }
@@ -203,41 +187,37 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "guild_emoji_event",
-  "message0": "server emoji %1",
+  "type": "bot_guild_event",
+  "message0": "bot %1 server",
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
       "options": [
         [
-          "created",
-          "CREATE"
+          "joins",
+          "JOIN"
         ],
         [
-          "updated",
-          "UPDATE"
+          "leaves",
+          "REMOVE"
         ],
-        [
-          "deleted",
-          "DELETE"
-        ]
       ]
     }
   ],
   "inputsInline": true,
   "output": "Boolean",
   "colour": '%{BKY_EVENT_HUE}',
-  "tooltip": "Represents a boolean value indicating whether an action related to server emoji creation, update, or deletion has occurred.",
+  "tooltip": "Represents a boolean value indicating whether the bot gets added or removed from a server.",
   "helpUrl": ""
 },
 {
   "type": "guild_sticker_event",
-  "message0": "server sticker %1",
+  "message0": "sticker %1",
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
       "options": [
         [
           "created",
@@ -261,12 +241,37 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "guild_member_event",
-  "message0": "server member %1",
+  "type": "guild_member_moderate_event",
+  "message0": "member %1",
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
+      "options": [
+        [
+          "banned",
+          "BAN"
+        ],
+        [
+          "unbanned",
+          "UNBAN"
+        ],
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether a member was banned or unbanned.",
+  "helpUrl": ""
+},
+{
+  "type": "guild_member_event",
+  "message0": "member %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "EVENT",
       "options": [
         [
           "joined",
@@ -295,11 +300,11 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "guild_role_event",
-  "message0": "server role %1",
+  "message0": "role %1",
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
       "options": [
         [
           "created",
@@ -324,11 +329,11 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "guild_scheduled_event_event",
-  "message0": "server scheduled event %1",
+  "message0": "scheduled event %1",
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
       "options": [
         [
           "created",
@@ -385,45 +390,6 @@ Blockly.defineBlocksWithJsonArray([
   "output": null,
   "colour": '%{BKY_INSTANCE_HUE}',
   "tooltip": " Retrieves a specific property of an object or variable",
-  "helpUrl": ""
-},
-{
-  "type": "add_reaction",
-  "message0": "to message %1 %2 reaction %3 %4 ",
-  "args0": [
-    {
-      "type": "input_value",
-      "name": "MESSAGE",
-      "check": "Message"
-    },
-    {
-      "type": "field_dropdown",
-      "name": "ACTION",
-      "options": [
-        [
-          "add",
-          "ADD"
-        ],
-        [
-          "remove",
-          "REMOVE"
-        ]
-      ]
-    },
-    {
-      "type": "input_dummy"
-    },
-    {
-      "type": "input_value",
-      "name": "REACTION",
-      "check": "String"
-    },
-  ],
-  "inputsInline": true,
-  "previousStatement": null,
-  "nextStatement": null,
-  "colour": '%{BKY_ACTION_HUE}',
-  "tooltip": "Removes or adds a reaction to a Message.",
   "helpUrl": ""
 },
 {
@@ -562,7 +528,7 @@ Blockly.defineBlocksWithJsonArray([
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
       "options": [
         [
           "sent",
@@ -591,7 +557,7 @@ Blockly.defineBlocksWithJsonArray([
   "args0": [
     {
       "type": "field_dropdown",
-      "name": "NAME",
+      "name": "EVENT",
       "options": [
         [
           "added",
@@ -616,6 +582,46 @@ Blockly.defineBlocksWithJsonArray([
 },
 ])
 
+
+Blockly.Blocks['reaction_action'] = {
+  validate: function(newValue) {
+    this.getSourceBlock().updateConnections(newValue);
+    return newValue;
+  },
+  init: function() {
+    this.setInputsInline(true)
+    this.setPreviousStatement(true)
+    this.setNextStatement(true)
+    this.setColour('%{BKY_ACTION_HUE}')
+    var options = [["add","ADD"],["remove","REMOVE"],["remove all","REMOVE_ALL"]]; 
+    this.appendValueInput('MESSAGE')
+      .appendField('to message')
+      .setCheck('Message')
+    this.appendDummyInput()
+      .appendField(new Blockly.FieldDropdown(options,this.validate), 'TYPE')
+    this.setTooltip('Removes or adds a reaction to a Message.')
+    this.updateConnections('ADD')
+  },
+  updateConnections: function(newValue){
+    this.removeInput('REACTION',true)
+    this.removeInput('DUMMY',true)
+    if (newValue == 'REMOVE_ALL'){
+      this.appendDummyInput('DUMMY')
+        .appendField('reactions')
+      }else{
+        parent = this.appendValueInput('REACTION')
+          .setCheck('String')
+          .appendField('reaction')
+        if (this.rendered && Workspace && !parent.connection.targetConnection && !parent.sourceBlock.isInFlyout){
+          var InputBlock = Workspace.newBlock('input')
+            InputBlock.setShadow(true)
+            InputBlock.initSvg()
+            InputBlock.render();
+          parent.connection.connect(InputBlock.outputConnection)
+        }
+    }
+  },
+}
 
 Blockly.Blocks['token_input'] = {
   init: function() {
