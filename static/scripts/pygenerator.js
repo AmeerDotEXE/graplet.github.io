@@ -150,7 +150,7 @@ const pyeventListener = function(block,generator){
   const innerCode = generator.statementToCode(block, 'DO');
   const eventBlock = block.getInputTargetBlock("EVENT");
   let argsString = eventBlock?.genEventRags.map(x => "event_"+to_snake_case(x[0])).join(", ") || "";
-  handleDispose(block,eventBlock);
+
   var code = `@client.event\nasync def ${value_event}(${argsString}):\n${innerCode}\n`;
   return code;
 };
@@ -166,16 +166,13 @@ python.pythonGenerator.forBlock['event_arg_placeholder'] = function(block, gener
 // EVENT BOOLS
 
 python.pythonGenerator.forBlock['channel_event'] = pyEventConverter('guild_channel')
-python.pythonGenerator.forBlock['message_event'] = pyEventConverter('message', {},['',null,null])
-python.pythonGenerator.forBlock['message_reaction_event'] = pyEventConverter('reaction', {},[null,null,'_clear'])
-python.pythonGenerator.forBlock['bot_guild_event'] = pyEventConverter('guild',{
-  JOIN: [["Server", "Guild"]],
-  REMOVE: [["Server", "Guild"]],
-})
+python.pythonGenerator.forBlock['message_event'] = pyEventConverter('message',['',null,null])
+python.pythonGenerator.forBlock['message_reaction_event'] = pyEventConverter('reaction',[null,null,'_clear'])
+python.pythonGenerator.forBlock['bot_guild_event'] = pyEventConverter('guild')
 python.pythonGenerator.forBlock['guild_event'] = pyEventConverter('guild')
-python.pythonGenerator.forBlock['guild_emoji_event'] = pyEventConverter('guild_emojis', {},['_update',null,'_update'])
-python.pythonGenerator.forBlock['guild_sticker_event'] = pyEventConverter('guild_stickers', {},['_update',null,'_update'])
-python.pythonGenerator.forBlock['guild_member_event'] = pyEventConverter('member', {},['_join',null,null])
+python.pythonGenerator.forBlock['guild_emoji_event'] = pyEventConverter('guild_emojis',['_update',null,'_update'])
+python.pythonGenerator.forBlock['guild_sticker_event'] = pyEventConverter('guild_stickers',['_update',null,'_update'])
+python.pythonGenerator.forBlock['guild_member_event'] = pyEventConverter('member',['_join',null,null])
 python.pythonGenerator.forBlock['guild_member_moderate_event'] = pyEventConverter('member')
 python.pythonGenerator.forBlock['guild_role_event'] = pyEventConverter('guild_role')
 python.pythonGenerator.forBlock['guild_scheduled_event_event'] = pyEventConverter('scheduled_event')
@@ -183,6 +180,7 @@ python.pythonGenerator.forBlock['guild_scheduled_event_event'] = pyEventConverte
 
 python.pythonGenerator.forBlock['botready'] = function(block, generator) {
   var code = 'on_ready';
+  block.genEventRags = [];
   return [code, python.Order.NONE];
 };
 
@@ -283,7 +281,7 @@ python.pythonGenerator.forBlock['token_input'] = function(block, generator) {
   return [`"${token}"`, python.Order.NONE];
 };
 
-function pyEventConverter(eventPrefix, args = {},manualCycle) {
+function pyEventConverter(eventPrefix,manualCycle) {
   return function(block, generator) {
     const field = block.getField('EVENT')
     const cycleIndex = parseInt(field.menuGenerator_.map(option => option[1]).indexOf(field.selectedOption[1]));
@@ -293,7 +291,7 @@ function pyEventConverter(eventPrefix, args = {},manualCycle) {
     }else{
       var code = 'on_'+eventPrefix + '_' + name.toLowerCase();
     }
-    block.genEventRags = args[name] || globalEventArguments[block.type]?.[name] || [];
+    block.genEventRags = globalEventArguments[block.type]?.[name] || [];
     return [code, python.Order.NONE];
   };
 }
