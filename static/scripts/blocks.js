@@ -373,26 +373,6 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "property_of",
-  "message0": "property %1 of %2",
-  "args0": [
-    {
-      "type": "input_dummy",
-      "name": "VALUE_CHILD"
-    },
-    {
-      "type": "input_value",
-      "name": "VALUE_PARENT"
-    }
-  ],
-  "extensions": ["dynamic_property_of"],
-  "inputsInline": true,
-  "output": null,
-  "colour": '%{BKY_INSTANCE_HUE}',
-  "tooltip": " Retrieves a specific property of an object or variable",
-  "helpUrl": ""
-},
-{
   "type": "change_guild_name",
   "message0": "change name of guild %1 to %2",
   "args0": [
@@ -635,6 +615,83 @@ Blockly.Blocks['reaction_action'] = {
           parent.connection.connect(InputBlock.outputConnection)
         }
     }
+  },
+}
+
+const property_of_Dict = {
+  'Client' : ['Guilds','User','Channels','Shard'],
+  'Message' : [['id','string'],['content','string'],['channel','Channel'],['server','Guild'],['user','User']],
+  'Channel' : [['id','string'],['name','string'],['server','Guild']],
+  'Guild' : [['id','string'],['name','string']],
+  'User': [['id','string']],
+}
+Blockly.Blocks['property_of'] = {
+  validate: function(newValue) {
+    this.getSourceBlock().updateConnections(newValue);
+    return newValue;
+  },
+  init: function() {
+    this.setInputsInline(true)
+    this.setColour('%{BKY_INSTANCE_HUE}')
+    this.setOutput(true, null);
+    this.setTooltip("Retrieves a specific property of an object or variable");
+
+    this.dropdownDefaultOptions = [["...","NONE"]];
+    this.appendDummyInput('VALUE_CHILD')
+      .appendField('property')
+      .appendField(new Blockly.FieldDropdown(this.dropdownDefaultOptions), 'VALUE');
+    this.appendValueInput('VALUE_PARENT')
+      .appendField('of');
+
+    this.isFirstTimeLoading = true;
+  },
+  saveExtraState: function() {
+    return {
+      'propertyOptions': this.latestOptionsValues || null,
+      'selectedOption': this.getField("VALUE").getValue(),
+    };
+  },
+  loadExtraState: function(state) {
+    let defaultOptions = this.dropdownDefaultOptions;
+    this.latestOptionsValues = state['propertyOptions'] || defaultOptions;
+    this.removeInput("VALUE_CHILD",true);
+
+    const block = this;
+    this.appendDummyInput('VALUE_CHILD')
+      .appendField('property')
+      .appendField(new Blockly.FieldDropdown(function() {
+        var options = defaultOptions;
+        if (block.isFirstTimeLoading) options = block.latestOptionsValues;
+
+        var child = block.getInput("VALUE_PARENT").connection.targetConnection;
+        if (child && property_of_Dict[child.getCheck()?.[0]]) {
+          options = options.concat(property_of_Dict[child.getCheck()?.[0]].map(function(property) {
+            return [property[0],property[0].toUpperCase().split(' ').join('_')];
+          }));
+        }
+
+        block.latestOptionsValues = options;
+        return options;
+      }, this.validate), 'VALUE');
+    this.moveInputBefore("VALUE_CHILD","VALUE_PARENT");
+
+    this.isFirstTimeLoading = false;
+    block.getField("VALUE").setValue(state['selectedOption']);
+  },
+  updateConnections: function(newValue){
+    if (newValue == "NONE") {
+      this.setOutput(true, null);
+      return;
+    }
+    var parentConnection = this.getInput("VALUE_PARENT").connection.targetConnection;
+    let selectedDictType = property_of_Dict[parentConnection.getCheck()?.[0]];
+    if (selectedDictType == null) {
+      this.getField("VALUE").setValue("NONE");
+      return;
+    }
+    let selectedDictOption = selectedDictType.find(x => x[0].toUpperCase().split(' ').join('_') == newValue);
+
+    this.setOutput(true,selectedDictOption[1]);
   },
 }
 

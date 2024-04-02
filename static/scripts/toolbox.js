@@ -225,8 +225,7 @@ var toolbox = {
           },
           {
             type: 'property_of',
-            kind: 'block',
-            disabled: true
+            kind: 'block'
           },
           {
             type: 'field_date',
