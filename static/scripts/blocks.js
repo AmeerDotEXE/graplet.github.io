@@ -571,7 +571,7 @@ Blockly.defineBlocksWithJsonArray([
     }
   ],
   "output": null,
-  "colour": 230,
+  "colour": '%{BKY_EVENT_HUE}',
   "tooltip": "",
   "helpUrl": ""
 }
@@ -684,6 +684,7 @@ Blockly.Blocks['property_of'] = {
       return;
     }
     var parentConnection = this.getInput("VALUE_PARENT").connection.targetConnection;
+    if (parentConnection == null) return; 
     let selectedDictType = property_of_Dict[parentConnection.getCheck()?.[0]];
     if (selectedDictType == null) {
       this.getField("VALUE").setValue("NONE");

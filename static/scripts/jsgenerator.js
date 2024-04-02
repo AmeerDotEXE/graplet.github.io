@@ -163,76 +163,20 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
 
 // EVENTS
 
-const eventListenerBlocks = function(block, generator) {
+const jseventListener = function(block, generator) {
   const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
   const eventBlock = block.getInputTargetBlock("EVENT");
   let argsString = eventBlock?.genEventRags.map(x => "event_"+to_snake_case(x[0])).join(", ") || "";
-
-  block.eventArgsList = eventBlock?.genEventRags || [];
-  if (block.lastEventArgs == null) {
-    block.lastEventArgs = [];
-    block.connectedEventArgs = [];
-  }
-
-  //handle new block creation
-  block.lastEventArgs.forEach((x,i) => {
-    let argBlock = block.getInputTargetBlock("ARG"+(i+1));
-    if (argBlock != null) {
-      if (!block.connectedEventArgs.includes(argBlock)) {
-        block.getInput("ARG"+(i+1)).connection.disconnect();
-      }
-      return;
-    }
-    
-    var InputBlock = Workspace.newBlock('event_arg_placeholder');
-    InputBlock.setFieldValue(x[0], "PLACEHOLDER");
-    InputBlock.eventArgOutput = x;
-    InputBlock.setOutput(true,x[1]);
-    InputBlock.initSvg();
-    InputBlock.render();
-    let inputField = block.getInput('ARG'+(i+1));
-    inputField.connection.connect(InputBlock.outputConnection);
-    block.connectedEventArgs.push(InputBlock);
-  });
-
-  //handle event change and remove references
-  if (block.lastEventArgs !== block.eventArgsList) {
-
-    //remove variable and its copies
-    block.connectedEventArgs.forEach(x => x.dispose(true));
-    block.connectedEventArgs = [];
-    block.lastEventArgs.forEach((x,i) => {
-      block.removeInput("ARG"+(i+1));
-    });
-
-    block.lastEventArgs = block.eventArgsList;
-    for (let index = 0; index < block.eventArgsList.length; index++) {
-      const element = block.eventArgsList[index];
-      
-      var InputBlock = Workspace.newBlock('event_arg_placeholder');
-      InputBlock.setFieldValue(element[0], "PLACEHOLDER");
-      InputBlock.eventArgOutput = element;
-      InputBlock.setOutput(true,element[1]);
-      InputBlock.initSvg();
-      InputBlock.render();
-      let inputField = block.appendValueInput('ARG'+(index+1));
-      if (index == 0) {
-        inputField.appendField('Outputs:');
-      }
-      inputField.connection.connect(InputBlock.outputConnection);
-      block.connectedEventArgs.push(InputBlock);
-      block.moveInputBefore('ARG'+(index+1), "DO");
-    }
-  }
-
+  handleDispose(block,eventBlock);
   var eventType = block.type;
   if (eventType == "when") eventType = "on";
   var code = `client.${eventType}(${value_event}, async(${argsString}) => {\n${innerCode}\n});\n`;
   return code;
 };
-javascript.javascriptGenerator.forBlock['once'] = eventListenerBlocks;
-javascript.javascriptGenerator.forBlock['when'] = eventListenerBlocks;
+javascript.javascriptGenerator.forBlock['once'] = jseventListener;
+javascript.javascriptGenerator.forBlock['when'] = jseventListener;
+
 javascript.javascriptGenerator.forBlock['event_arg_placeholder'] = function(block, generator) {
   var code = `event_${to_snake_case(block.eventArgOutput[0])}`;
   return [code, javascript.Order.NONE];
@@ -353,9 +297,46 @@ javascript.javascriptGenerator.forBlock['field_date'] = function(block, generato
 
 
 javascript.javascriptGenerator.forBlock['embed_builder'] = function(block, generator) {
-  // TODO: add mutators & Code
-  var code = '\n';
-  return [code, javascript.Order.NONE];
+  description = generator.valueToCode(block, 'DESCRIPTION', javascript.Order.NONE);
+  title = generator.valueToCode(block, 'TITLE', javascript.Order.NONE);
+  colour = generator.valueToCode(block, 'COLOUR', javascript.Order.NONE);
+
+  author_name = generator.valueToCode(block, 'AUTHOR_NAME', javascript.Order.NONE);
+  author_icon_url = generator.valueToCode(block, 'AUTHOR_ICON_URL', javascript.Order.NONE);
+  author_url = generator.valueToCode(block, 'AUTHOR_URL', javascript.Order.NONE);
+  
+  footer_text = generator.valueToCode(block, 'FOOTER_TEXT', javascript.Order.NONE);
+  footer_icon_url = generator.valueToCode(block, 'FOOTER_ICON_URL', javascript.Order.NONE);
+
+  embed = 'new EmbedBuilder()'
+  if(description){
+    embed = embed.concat(`.setDescription(${description})`)
+  }
+  if(title){
+    embed = embed.concat(`.setTitle(${title})`)
+  }
+  if(colour){
+    embed = embed.concat(`.setColor(${colour})`)
+  }
+  if(author_name){
+    embed = embed.concat(`.setAuthor({name: ${author_name},`)
+    if (author_icon_url){
+      embed = embed.concat(`iconURL: ${author_icon_url},`)
+    }
+    if (author_url){
+      embed= embed.concat(`url: ${author_url},`)
+    }
+    embed = embed.slice(0, -1);
+    embed = embed.concat('});')
+  }
+  if(footer_text){
+    embed = embed.concat(`.setFooter({text: ${footer_text},`)
+    if (footer_icon_url){
+      embed = embed.concat(`iconURL: ${footer_icon_url},`)
+    }
+    embed = `${embed.slice(0, -1)}});`;
+  }
+  return [embed, javascript.Order.NONE];
 };
 
 javascript.javascriptGenerator.forBlock['token_input'] = function(block, generator) {

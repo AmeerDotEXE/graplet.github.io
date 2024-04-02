@@ -144,79 +144,20 @@ python.pythonGenerator.forBlock['get_by_id'] = function(block, generator) {
 
 // EVENTS
 
-python.pythonGenerator.forBlock['once'] = function(block, generator) {
-  const value_event = generator.valueToCode(block, 'EVENT', python.Order.NONE);
-  const innerCode = generator.statementToCode(block, 'DO');
-  var code = `@client.event\nasync def ${value_event}\n${innerCode}\n`;
-  return code;
-};
 
-python.pythonGenerator.forBlock['when'] = function(block, generator) {
+const pyeventListener = function(block,generator){
   const value_event = generator.valueToCode(block, 'EVENT', python.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
   const eventBlock = block.getInputTargetBlock("EVENT");
   let argsString = eventBlock?.genEventRags.map(x => "event_"+to_snake_case(x[0])).join(", ") || "";
-
-  block.eventArgsList = eventBlock?.genEventRags || [];
-  if (block.lastEventArgs == null) {
-    block.lastEventArgs = [];
-    block.connectedEventArgs = [];
-  }
-
-  //handle new block creation
-  block.lastEventArgs.forEach((x,i) => {
-    let argBlock = block.getInputTargetBlock("ARG"+(i+1));
-    if (argBlock != null) {
-      if (!block.connectedEventArgs.includes(argBlock)) {
-        block.getInput("ARG"+(i+1)).connection.disconnect();
-      }
-      return;
-    }
-    
-    var InputBlock = Workspace.newBlock('event_arg_placeholder');
-    InputBlock.setFieldValue(x[0], "PLACEHOLDER");
-    InputBlock.eventArgOutput = x;
-    InputBlock.setOutput(true,x[1]);
-    InputBlock.initSvg();
-    InputBlock.render();
-    let inputField = block.getInput('ARG'+(i+1));
-    inputField.connection.connect(InputBlock.outputConnection);
-    block.connectedEventArgs.push(InputBlock);
-  });
-
-  //handle event change and remove references
-  if (block.lastEventArgs !== block.eventArgsList) {
-
-    //remove variable and its copies
-    block.connectedEventArgs.forEach(x => x.dispose(true));
-    block.connectedEventArgs = [];
-    block.lastEventArgs.forEach((x,i) => {
-      block.removeInput("ARG"+(i+1));
-    });
-
-    block.lastEventArgs = block.eventArgsList;
-    for (let index = 0; index < block.eventArgsList.length; index++) {
-      const element = block.eventArgsList[index];
-      
-      var InputBlock = Workspace.newBlock('event_arg_placeholder');
-      InputBlock.setFieldValue(element[0], "PLACEHOLDER");
-      InputBlock.eventArgOutput = element;
-      InputBlock.setOutput(true,element[1]);
-      InputBlock.initSvg();
-      InputBlock.render();
-      let inputField = block.appendValueInput('ARG'+(index+1));
-      if (index == 0) {
-        inputField.appendField('Outputs:');
-      }
-      inputField.connection.connect(InputBlock.outputConnection);
-      block.connectedEventArgs.push(InputBlock);
-      block.moveInputBefore('ARG'+(index+1), "DO");
-    }
-  }
-
+  handleDispose(block,eventBlock);
   var code = `@client.event\nasync def ${value_event}(${argsString}):\n${innerCode}\n`;
   return code;
 };
+
+python.pythonGenerator.forBlock['once'] = pyeventListener;
+python.pythonGenerator.forBlock['when'] = pyeventListener;
+
 python.pythonGenerator.forBlock['event_arg_placeholder'] = function(block, generator) {
   var code = `event_${to_snake_case(block.eventArgOutput[0])}`;
   return [code, python.Order.NONE];
@@ -295,17 +236,52 @@ python.pythonGenerator.forBlock['field_date'] = function(block, generator) {
 
 
 python.pythonGenerator.forBlock['embed_builder'] = function(block, generator) {
-  // TODO: add mutators & Code
-  var code = '\n';
-  return [code, python.Order.NONE];
+  description = generator.valueToCode(block, 'DESCRIPTION', python.Order.NONE);
+  title = generator.valueToCode(block, 'TITLE', python.Order.NONE);
+  colour = generator.valueToCode(block, 'COLOUR', python.Order.NONE);
+
+  author_name = generator.valueToCode(block, 'AUTHOR_NAME', python.Order.NONE);
+  author_url = generator.valueToCode(block, 'AUTHOR_URL', python.Order.NONE);
+  author_icon_url = generator.valueToCode(block, 'AUTHOR_ICON_URL', python.Order.NONE);
+
+  footer_text = generator.valueToCode(block, 'FOOTER_TEXT', python.Order.NONE);
+  footer_icon_url = generator.valueToCode(block, 'FOOTER_ICON_URL', python.Order.NONE);
+
+  embed = 'discord.Embed('
+  if(description){
+    embed = embed.concat(`description=${description},`)
+  }
+  if(title){
+    embed = embed.concat(`title=${title},`)
+  }
+  if(colour){
+    embed = embed.concat(`colour=${colour},`)
+  }
+  embed = `${embed.slice(0, -1)})`
+  if(author_name){
+    embed = embed.concat(`.setauthor(name=${author_name},`)
+    if (author_url){
+      embed = embed.concat(`url=${author_url},`)
+    }
+    if (author_icon_url){
+      embed = embed.concat(`icon_url=${author_icon_url},`)
+    }
+    embed = `${embed.slice(0, -1)})`
+  }
+  if(footer_text){
+    embed = embed.concat(`.setauthor(text=${footer_text},`)
+    if (footer_icon_url){
+      embed = embed.concat(`icon_url=${footer_icon_url},`)
+    }
+    embed = `${embed.slice(0, -1)})`
+  }
+  return [embed, python.Order.NONE];
 };
 
 python.pythonGenerator.forBlock['token_input'] = function(block, generator) {
   var token = block.getFieldValue('TOKEN');
   return [`"${token}"`, python.Order.NONE];
 };
-
-
 
 function pyEventConverter(eventPrefix, args = {},manualCycle) {
   return function(block, generator) {

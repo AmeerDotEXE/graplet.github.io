@@ -299,7 +299,7 @@ function deleteProject(){
       const objectStore = db.transaction(["projects"], "readwrite").objectStore("projects");
       const request = objectStore.delete(parseInt(ProjectIDRoot));
       request.onsuccess = (event) =>{
-        window.location.href = 'projects.html'; 
+        window.location.href = '/projects/'; 
       }
       request.onerror = (event) => {
         alert("There was an error deleting the project.");
