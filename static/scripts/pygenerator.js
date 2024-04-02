@@ -166,7 +166,12 @@ python.pythonGenerator.forBlock['when'] = function(block, generator) {
   //handle new block creation
   block.lastEventArgs.forEach((x,i) => {
     let argBlock = block.getInputTargetBlock("ARG"+(i+1));
-    if (argBlock != null) return;
+    if (argBlock != null) {
+      if (!block.connectedEventArgs.includes(argBlock)) {
+        block.getInput("ARG"+(i+1)).connection.disconnect();
+      }
+      return;
+    }
     
     var InputBlock = Workspace.newBlock('event_arg_placeholder');
     InputBlock.setFieldValue(x[0], "PLACEHOLDER");
@@ -242,18 +247,45 @@ python.pythonGenerator.forBlock['botready'] = function(block, generator) {
 
 // INSTANCES
 
-python.pythonGenerator.forBlock['property_of'] = function(block, generator) {
-  const PARENT = generator.valueToCode(block, 'VALUE_PARENT', python.Order.ATOMIC);
-  const CHILD = null;
-  if (PARENT != null) {
-    if (CHILD != null){
-      return `${PARENT}${CHILD}`
-    }else{
-      return `${PARENT}`
+let pyTypeProperties = {
+  Message: function(parentValue, dropdown_value, block, generator) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "CONTENT":
+        code = `${parentValue}.content`;
+        break;
+      case "CHANNEL":
+        code = `${parentValue}.channel`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+      case "USER":
+        code = `${parentValue}.author`;
+        break;
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
     }
-  }else{
-    return null
-}};
+
+    return code;
+  },
+};
+
+python.pythonGenerator.forBlock['property_of'] = function(block, generator) {
+  const PARENT = generator.valueToCode(block, 'VALUE_PARENT', python.Order.NONE);
+  const CHILD = block.getFieldValue('VALUE');
+  if (CHILD == "NONE") return ["null", python.Order.NONE];
+
+  const ParentType = block.getInput("VALUE_PARENT").connection.targetConnection?.getCheck()?.[0];
+  if (ParentType != null) {
+    let code = pyTypeProperties[ParentType]?.(PARENT, CHILD, block, generator);
+    if (code) return [code, python.Order.NONE];
+    }
+
+  return ["null", python.Order.NONE];
+};
 
 python.pythonGenerator.forBlock['field_date'] = function(block, generator) {
   var time = block.getFieldValue('FIELDNAME');

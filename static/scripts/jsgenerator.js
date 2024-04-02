@@ -178,7 +178,12 @@ const eventListenerBlocks = function(block, generator) {
   //handle new block creation
   block.lastEventArgs.forEach((x,i) => {
     let argBlock = block.getInputTargetBlock("ARG"+(i+1));
-    if (argBlock != null) return;
+    if (argBlock != null) {
+      if (!block.connectedEventArgs.includes(argBlock)) {
+        block.getInput("ARG"+(i+1)).connection.disconnect();
+      }
+      return;
+    }
     
     var InputBlock = Workspace.newBlock('event_arg_placeholder');
     InputBlock.setFieldValue(x[0], "PLACEHOLDER");
@@ -258,18 +263,87 @@ javascript.javascriptGenerator.forBlock['bot_guild_event'] = jsEventConverter("G
 
 // INSTANCES
 
-javascript.javascriptGenerator.forBlock['property_of'] = function(block, generator) {
-  const PARENT = generator.valueToCode(block, 'VALUE_PARENT', javascript.Order.ATOMIC);
-  const CHILD = null;
-  if (PARENT != null) {
-    if (CHILD != null){
-      return `${PARENT}${CHILD}`
-    }else{
-      return `${PARENT}`
+let jsTypeProperties = {
+  Message: function(parentValue, dropdown_value, block, generator) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "CONTENT":
+        code = `${parentValue}.content`;
+        break;
+      case "CHANNEL":
+        code = `${parentValue}.channel`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+      case "USER":
+        code = `${parentValue}.author`;
+        break;
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
     }
-  }else{
-    return null
-}};
+
+    return code;
+  },
+  Guild: function(parentValue, dropdown_value, block, generator) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+    }
+
+    return code;
+  },
+  Channel: function(parentValue, dropdown_value, block, generator) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "NAME":
+        code = `${parentValue}.name`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+    }
+
+    return code;
+  },
+  Guild: function(parentValue, dropdown_value, block, generator) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "NAME":
+        code = `${parentValue}.name`;
+        break;
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+    }
+
+    return code;
+  },
+};
+
+javascript.javascriptGenerator.forBlock['property_of'] = function(block, generator) {
+  const PARENT = generator.valueToCode(block, 'VALUE_PARENT', javascript.Order.NONE);
+  const CHILD = block.getFieldValue('VALUE');
+  if (CHILD == "NONE") return ["null", javascript.Order.NONE];
+
+  const ParentType = block.getInput("VALUE_PARENT").connection.targetConnection?.getCheck()?.[0];
+  if (ParentType != null) {
+    let code = jsTypeProperties[ParentType]?.(PARENT, CHILD, block, generator);
+      if (code) return [code, javascript.Order.NONE];
+    }
+
+  return ["null", javascript.Order.NONE];
+};
 
 javascript.javascriptGenerator.forBlock['field_date'] = function(block, generator) {
   var time = block.getFieldValue('FIELDNAME');
