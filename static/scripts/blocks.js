@@ -77,25 +77,6 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "when",
-  "message0": "when %1 %2",
-  "args0": [
-    {
-      "type": "input_value",
-      "name": "EVENT",
-      "check": "Boolean"
-    },
-    {
-      "type": "input_statement",
-      "name": "DO"
-    }
-  ],
-  "inputsInline": true,
-  "colour": '%{BKY_EVENT_HUE}',
-  "tooltip": "Executes every time the specified condition is true.",
-  "helpUrl": ""
-},
-{
   "type": "channel_event",
   "message0": "channel %1",
   "args0": [
@@ -560,21 +541,6 @@ Blockly.defineBlocksWithJsonArray([
   "tooltip": "Represents a boolean value indicating whether an action related to message reaction has occurred.",
   "helpUrl": ""
 },
-{
-  "type": "event_arg_placeholder",
-  "message0": "%1",
-  "args0": [
-    {
-      "type": "field_label_serializable",
-      "name": "PLACEHOLDER",
-      "text": ""
-    }
-  ],
-  "output": null,
-  "colour": '%{BKY_EVENT_HUE}',
-  "tooltip": "",
-  "helpUrl": ""
-}
 ])
 
 
@@ -619,7 +585,6 @@ Blockly.Blocks['reaction_action'] = {
 }
 
 const property_of_Dict = {
-  'Client' : ['Guilds','User','Channels','Shard'],
   'Message' : [['id','string'],['content','string'],['channel','Channel'],['server','Guild'],['user','User']],
   'Channel' : [['id','string'],['name','string'],['server','Guild']],
   'Guild' : [['id','string'],['name','string']],
@@ -684,7 +649,7 @@ Blockly.Blocks['property_of'] = {
       return;
     }
     var parentConnection = this.getInput("VALUE_PARENT").connection.targetConnection;
-    if (parentConnection == null) return; 
+    if (parentConnection == null) return;
     let selectedDictType = property_of_Dict[parentConnection.getCheck()?.[0]];
     if (selectedDictType == null) {
       this.getField("VALUE").setValue("NONE");
@@ -771,6 +736,226 @@ Blockly.Blocks['get_by_id'] = {
   }
 }
 
+
+let globalEventArguments = {
+  message_event: {
+    CREATE: [["Message", "Message"]],
+    UPDATE: [["Old Message", "Message"], ["New Message", "Message"]],
+    DELETE: [["Message", "Message"]],
+  },
+};
+const ArgumentEventHandler = function(block) {
+  const eventBlock = block.getInputTargetBlock("EVENT");
+
+  block.eventArgsList = eventBlock?.genEventRags || [];
+  if (block.lastEventArgs == null) {
+    block.lastEventArgs = [];
+    block.connectedEventArgs = [];
+  }
+
+  //handle new block creation
+  block.lastEventArgs.forEach((x,i) => {
+    let argBlock = block.getInputTargetBlock("ARG"+(i+1));
+    if (argBlock != null) {
+      if (!block.connectedEventArgs.includes(argBlock)) {
+        if (this.isFirstTimeSetup) {
+          argBlock.dispose(true);
+        } else {
+          block.getInput("ARG"+(i+1)).connection.disconnect();
+        }
+      }
+      return;
+    }
+    
+    var InputBlock = Workspace.newBlock('event_arg_placeholder');
+    InputBlock.setFieldValue(x[0], "PLACEHOLDER");
+    InputBlock.eventArgOutput = x;
+    InputBlock.setOutput(true,x[1]);
+    InputBlock.initSvg();
+    InputBlock.render();
+    let inputField = block.getInput('ARG'+(i+1));
+    inputField?.connection.connect(InputBlock.outputConnection);
+    block.connectedEventArgs.push(InputBlock);
+  });
+
+  //handle event change and remove references
+  if (block.lastEventArgs !== block.eventArgsList) {
+
+    //remove variable and its copies
+    block.connectedEventArgs.forEach(x => x.dispose(true));
+    block.connectedEventArgs = [];
+    block.lastEventArgs.forEach((x,i) => {
+      block.removeInput("ARG"+(i+1));
+    });
+
+    block.lastEventArgs = block.eventArgsList;
+    for (let index = 0; index < block.eventArgsList.length; index++) {
+      const element = block.eventArgsList[index];
+      
+      var InputBlock = Workspace.newBlock('event_arg_placeholder');
+      InputBlock.setFieldValue(element[0], "PLACEHOLDER");
+      InputBlock.eventArgOutput = element;
+      InputBlock.setOutput(true,element[1]);
+      InputBlock.initSvg();
+      InputBlock.render();
+      let inputField = block.appendValueInput('ARG'+(index+1));
+      if (index == 0) {
+        inputField.appendField('Outputs:');
+      }
+      inputField.connection.connect(InputBlock.outputConnection);
+      block.connectedEventArgs.push(InputBlock);
+      block.moveInputBefore('ARG'+(index+1), "DO");
+    }
+  }
+  this.isFirstTimeSetup = false;
+};
+Blockly.Blocks['when'] = {
+  init: function() {
+    this.setInputsInline(true)
+    this.setColour('%{BKY_EVENT_HUE}')
+    this.setTooltip("Executes every time the specified condition is true.");
+
+    this.appendValueInput('EVENT')
+      .appendField('when')
+      .setCheck("Boolean");
+    this.appendStatementInput('DO');
+
+    if (Workspace == null) return;
+    const block = this;
+    Workspace.addChangeListener((event) => {
+      if (this.isFirstTimeSetup && event.type == "create") {
+        this.updateEventArguments(block);
+        return;
+      }
+      if (event.type !== "move" && event.type !== "change") return;
+      if (event.reason && !(event.reason.includes("connect") || event.reason.includes("disconnect"))) return;
+      //comment the line bellow to skip dropping
+      if (event.reason && event.reason.includes("disconnect") && event.oldInputName.startsWith("ARG")) return;
+
+      this.updateEventArguments(block);
+    });
+
+    this.isFirstTimeLoading = true;
+    this.isFirstTimeSetup = true;
+  },
+  updateEventArguments: ArgumentEventHandler,
+  saveExtraState: function() {
+    return {
+      'eventArgsList': this.eventArgsList || [],
+    };
+  },
+  loadExtraState: function(state) {
+    const block = this;
+    block.eventArgsList = state.eventArgsList;
+
+    if (!this.isFirstTimeLoading) return;
+    this.isFirstTimeLoading = false;
+    block.lastEventArgs = [];
+    block.connectedEventArgs = [];
+
+    if (block.lastEventArgs == block.eventArgsList) return;
+    block.lastEventArgs = block.eventArgsList;
+    for (let index = 0; index < block.eventArgsList.length; index++) {
+      let inputField = block.appendValueInput('ARG'+(index+1));
+      if (index == 0) { inputField.appendField('Outputs:'); }
+      block.moveInputBefore('ARG'+(index+1), "DO");
+    }
+  },
+}
+Blockly.Blocks['once'] = {
+  init: function() {
+    this.setInputsInline(true)
+    this.setColour('%{BKY_EVENT_HUE}')
+    this.setTooltip("Executes every time the specified condition is true.");
+
+    this.appendValueInput('EVENT')
+      .appendField('once')
+      .setCheck("Boolean");
+    this.appendStatementInput('DO');
+
+    if (Workspace == null) return;
+    const block = this;
+    Workspace.addChangeListener((event) => {
+      if (this.isFirstTimeSetup && event.type == "create") {
+        this.updateEventArguments(block);
+        return;
+      }
+      if (event.type !== "move" && event.type !== "change") return;
+      if (event.reason && !(event.reason.includes("connect") || event.reason.includes("disconnect"))) return;
+      //comment the line bellow to skip dropping
+      if (event.reason && event.reason.includes("disconnect") && event.oldInputName.startsWith("ARG")) return;
+
+      this.updateEventArguments(block);
+    });
+
+    this.isFirstTimeLoading = true;
+    this.isFirstTimeSetup = true;
+  },
+  updateEventArguments: ArgumentEventHandler,
+  saveExtraState: function() {
+    return {
+      'eventArgsList': this.eventArgsList || [],
+    };
+  },
+  loadExtraState: function(state) {
+    const block = this;
+    block.eventArgsList = state.eventArgsList;
+
+    if (!this.isFirstTimeLoading) return;
+    this.isFirstTimeLoading = false;
+    block.lastEventArgs = [];
+    block.connectedEventArgs = [];
+
+    if (block.lastEventArgs == block.eventArgsList) return;
+    block.lastEventArgs = block.eventArgsList;
+    for (let index = 0; index < block.eventArgsList.length; index++) {
+      let inputField = block.appendValueInput('ARG'+(index+1));
+      if (index == 0) { inputField.appendField('Outputs:'); }
+      block.moveInputBefore('ARG'+(index+1), "DO");
+    }
+  },
+}
+
+
+
+Blockly.Blocks['event_arg_placeholder'] = {
+  init: function() {
+    this.setOutput(true, null);
+    this.setColour(230);
+
+    this.appendDummyInput()
+      .appendField('', 'PLACEHOLDER');
+    
+    if (Workspace == null) return;
+    const parentFinder = () => {
+      const rootBlock = this.getRootBlock();
+
+      if (rootBlock.type == this.type) return;
+      if (rootBlock.type !== "when" && rootBlock.type !== "once") return;
+
+      Workspace.removeChangeListener(parentFinder);
+      rootBlock.connectedEventArgs.push(this);
+    };
+
+    Workspace.addChangeListener(parentFinder);
+  },
+  saveExtraState: function() {
+    return {
+      'eventArgsList': this.eventArgOutput,
+    };
+  },
+  loadExtraState: function(state) {
+    const block = this;
+    if (state.eventArgsList == null) {
+      // console.log("no eventArgsList", block);
+      block.dispose(true);
+      return;
+    }
+    block.eventArgOutput = state.eventArgsList;
+    block.setFieldValue(block.eventArgOutput[0], "PLACEHOLDER");
+    block.setOutput(true, block.eventArgOutput[1]);
+  },
+}
 
 
 
@@ -959,13 +1144,6 @@ Blockly.Blocks['message_action'] = messageActions
 Blockly.Blocks['role_action'] = roleActions
 
 
-let globalEventArguments = {
-  message_event: {
-    CREATE: [["Message", "Message"]],
-    UPDATE: [["Old Message", "Message"], ["New Message", "Message"]],
-    DELETE: [["Message", "Message"]],
-  },
-};
 
 
 
