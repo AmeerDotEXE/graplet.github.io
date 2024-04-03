@@ -171,7 +171,7 @@ const eventListenerBlocks = function(block, generator) {
 
   var eventType = block.type;
   if (eventType == "when") eventType = "on";
-  var code = `client.${eventType}(${value_event}, async(${argsString}) => {\n${innerCode}\n});\n`;
+  var code = `client.${eventType}(${value_event}, async(${argsString}) => {\n${innerCode}});\n`;
   return code;
 };
 javascript.javascriptGenerator.forBlock['once'] = eventListenerBlocks;
@@ -183,12 +183,7 @@ javascript.javascriptGenerator.forBlock['event_arg_placeholder'] = function(bloc
 
 // EVENT BOOLS
 
-javascript.javascriptGenerator.forBlock['botready'] = function(block, generator) {
-  var code = 'Discord.Events.ClientReady';
-  block.genEventRags = [];
-  return [code, javascript.Order.NONE];
-};
-
+javascript.javascriptGenerator.forBlock['botready'] = jsEventConverter("ClientReady");
 javascript.javascriptGenerator.forBlock['channel_event'] = jsEventConverter("Channel");
 javascript.javascriptGenerator.forBlock['guild_emoji_event'] = jsEventConverter("GuildEmoji");
 javascript.javascriptGenerator.forBlock['message_event'] = jsEventConverter("Message");
@@ -196,10 +191,23 @@ javascript.javascriptGenerator.forBlock['message_reaction_event'] = jsEventConve
 javascript.javascriptGenerator.forBlock['guild_event'] = jsEventConverter("Guild");
 javascript.javascriptGenerator.forBlock['guild_sticker_event'] = jsEventConverter("GuildSticker");
 javascript.javascriptGenerator.forBlock['guild_member_event'] = jsEventConverter("GuildMember");
-javascript.javascriptGenerator.forBlock['guild_member_moderate_event'] = jsEventConverter("GuildBan", {}, {"BAN":"ADD","UNBAN":"REMOVE"});
+javascript.javascriptGenerator.forBlock['guild_member_moderate_event'] = jsEventConverter("GuildBan", {"BAN":"ADD","UNBAN":"REMOVE"});
 javascript.javascriptGenerator.forBlock['guild_role_event'] = jsEventConverter("GuildRole");
 javascript.javascriptGenerator.forBlock['guild_scheduled_event_event'] = jsEventConverter("GuildScheduledEvent");
 javascript.javascriptGenerator.forBlock['bot_guild_event'] = jsEventConverter("Guild", {"JOIN":"CREATE","REMOVE":"DELETE"});
+javascript.javascriptGenerator.forBlock['automod_rule_event'] = jsEventConverter("AutoModerationRule");
+javascript.javascriptGenerator.forBlock['automod_action_event'] = jsEventConverter("AutoModerationActionExecution");
+javascript.javascriptGenerator.forBlock['channel_typing_event'] = jsEventConverter("TypingStart");
+javascript.javascriptGenerator.forBlock['shard_event'] = jsEventConverter("Shard");
+javascript.javascriptGenerator.forBlock['audit_log_event'] = jsEventConverter("GuildAuditLogEntryCreate");
+javascript.javascriptGenerator.forBlock['invite_event'] = jsEventConverter("Invite");
+javascript.javascriptGenerator.forBlock['webhook_event'] = jsEventConverter("WebhooksUpdate");
+javascript.javascriptGenerator.forBlock['interaction_event'] = jsEventConverter("InteractionCreate");
+javascript.javascriptGenerator.forBlock['user_event'] = jsEventConverter("UserUpdate");
+javascript.javascriptGenerator.forBlock['presence_event'] = jsEventConverter("PresenceUpdate");
+javascript.javascriptGenerator.forBlock['voice_event'] = jsEventConverter("VoiceStateUpdate");
+javascript.javascriptGenerator.forBlock['stage_event'] = jsEventConverter("StageInstance");
+javascript.javascriptGenerator.forBlock['thread_event'] = jsEventConverter("Thread");
 
 // INSTANCES
 
@@ -346,10 +354,16 @@ javascript.javascriptGenerator.forBlock['token_input'] = function(block, generat
 
 function jsEventConverter (eventPrefix, replaceValues) {
   return function(block, generator) {
+    var eventSuffix = '';
     var dropdown_name = block.getFieldValue('EVENT');
-    block.genEventRags = globalEventArguments[block.type]?.[dropdown_name] || [];
-    if (replaceValues) dropdown_name = replaceValues[dropdown_name] || dropdown_name;
-    var eventName = eventPrefix + toPascalCase(dropdown_name);
+    if (dropdown_name == null) {
+      block.genEventRags = globalEventArguments[block.type] || [];
+    } else {
+      block.genEventRags = globalEventArguments[block.type]?.[dropdown_name] || [];
+      if (replaceValues) dropdown_name = replaceValues[dropdown_name] || dropdown_name;
+      eventSuffix = toPascalCase(dropdown_name);
+    }
+    var eventName = eventPrefix + eventSuffix;
     var code = 'Discord.Events.'+eventName;
     return [code, javascript.Order.NONE];
   };
