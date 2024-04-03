@@ -218,7 +218,7 @@ Blockly.defineBlocksWithJsonArray([
   "inputsInline": true,
   "output": "Boolean",
   "colour": '%{BKY_EVENT_HUE}',
-  "tooltip": "Represents a boolean value indicating whether an action related to server emoji creation, update, or deletion has occurred.",
+  "tooltip": "Represents a boolean value indicating whether an action related to server sticker creation, update, or deletion has occurred.",
   "helpUrl": ""
 },
 {
@@ -348,6 +348,7 @@ Blockly.defineBlocksWithJsonArray([
 {
   "type": "botready",
   "message0": "bot is ready",
+  "inputsInline": true,
   "output": "Boolean",
   "colour": '%{BKY_EVENT_HUE}',
   "tooltip": "Triggers when the Discord bot is fully ready and connected to the server.",
@@ -529,7 +530,11 @@ Blockly.defineBlocksWithJsonArray([
           "REMOVE"
         ],
         [
-          "removed all",
+          "removed an emoji",
+          "REMOVE_EMOJI"
+        ],
+        [
+          "cleared",
           "REMOVE_ALL"
         ]
       ]
@@ -539,6 +544,178 @@ Blockly.defineBlocksWithJsonArray([
   "output": "Boolean",
   "colour": '%{BKY_EVENT_HUE}',
   "tooltip": "Represents a boolean value indicating whether an action related to message reaction has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "automod_rule_event",
+  "message0": "AutoMod rule %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "EVENT",
+      "options": [
+        [ "created", "CREATE" ],
+        [ "updated", "UPDATE" ],
+        [ "deleted", "DELETE" ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to automod rules has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "automod_action_event",
+  "message0": "AutoMod Trigger",
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Triggers when any AutoMod action triggers.",
+  "helpUrl": ""
+},
+{
+  "type": "channel_typing_event",
+  "message0": "Typing Trigger",
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Triggers when anyone starts typing in a channel.",
+  "helpUrl": ""
+},
+{
+  "type": "shard_event",
+  "message0": "shard %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "EVENT",
+      "options": [
+        [ "ready", "READY" ],
+        [ "resumed", "RESUME" ],
+        [ "disconnected", "DISCONNECT" ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to Shards has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "audit_log_event",
+  "message0": "Server Audit Log",
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Triggers when server audit log entry is created.",
+  "helpUrl": ""
+},
+{
+  "type": "invite_event",
+  "message0": "invite %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "EVENT",
+      "options": [
+        [ "created", "CREATE" ],
+        [ "deleted", "DELETE" ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to invits has occurred.",
+  "helpUrl": ""
+},
+// REVIEW - guild integration
+{
+  "type": "webhook_event",
+  "message0": "Webhook Updated",
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Triggers whenever a webhook is created, modified, or removed from a guild channel.",
+  "helpUrl": ""
+},
+{
+  "type": "interaction_event",
+  "message0": "Interaction Triggered",
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Triggers when an interaction is created.",
+  "helpUrl": ""
+},
+{
+  "type": "user_event",
+  "message0": "User Updated",
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Triggers whenever a user's details (e.g. username) are changed.",
+  "helpUrl": ""
+},
+{
+  "type": "presence_event",
+  "message0": "Presence Updated",
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Triggers whenever a guild member's presence (e.g. status, activity) is changed.",
+  "helpUrl": ""
+},
+{
+  "type": "voice_event",
+  "message0": "Voice State Updated",
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Triggers whenever a member changes voice state - e.g. joins/leaves a channel, mutes/unmutes.",
+  "helpUrl": ""
+},
+{
+  "type": "stage_event",
+  "message0": "stage %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "EVENT",
+      "options": [
+        [ "started", "CREATE" ],
+        [ "ended", "DELETE" ],
+        [ "updated", "UPDATE" ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to stage channels has occurred.",
+  "helpUrl": ""
+},
+{
+  "type": "thread_event",
+  "message0": "thread %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "EVENT",
+      "options": [
+        [ "created", "CREATE" ],
+        [ "updated", "UPDATE" ],
+        [ "deleted", "DELETE" ]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Represents a boolean value indicating whether an action related to stage channels has occurred.",
   "helpUrl": ""
 },
 ])
@@ -738,10 +915,75 @@ Blockly.Blocks['get_by_id'] = {
 
 
 let globalEventArguments = {
+  bot_guild_event: {
+    JOIN: [["Server", "Guild"]],
+    REMOVE: [["Server", "Guild"]],
+  },
+  channel_event: {
+    CREATE: [["Channel", "Channel"]],
+    UPDATE: [["Old Channel", "Channel"],["New Channel", "Channel"]],
+    DELETE: [["Channel", "Channel"]],
+    PINS_UPDATE: [["Channel", "Channel"]],
+  },
   message_event: {
     CREATE: [["Message", "Message"]],
     UPDATE: [["Old Message", "Message"], ["New Message", "Message"]],
     DELETE: [["Message", "Message"]],
+  },
+  message_reaction_event: {
+    ADD: [["Reaction","MessageReaction"],["User","User"]],
+    REMOVE: [["Reaction","MessageReaction"],["User","User"]],
+    REMOVE_EMOJI: [["Reaction","MessageReaction"]],
+    REMOVE_ALL: [["Message","Message"]],
+  },
+  guild_event: {
+    UPDATE: [["Old Server", "Guild"],["New Server", "Guild"]],
+    AVAILABLE: [["Server", "Guild"]],
+    UNAVAILABLE: [["Server", "Guild"]],
+  },
+  guild_member_event: {
+    ADD: [["Member", "Member"]],
+    UPDATE: [["Old Member", "Member"], ["New Member", "Member"]],
+    REMOVE: [["Member", "Member"]],
+    // AVAILABLE: [["Member", "Member"]], // TODO: not available in python
+  },
+  guild_role_event: {
+    CREATE: [["Role", "Role"]],
+    UPDATE: [["Old Role", "Role"], ["New Role", "Role"]],
+    DELETE: [["Role", "Role"]],
+  },
+  guild_scheduled_event_event: {
+    ADD: [["Event", "GuildScheduledEvent"]],
+    UPDATE: [["Old Event", "GuildScheduledEvent"], ["New Event", "GuildScheduledEvent"]],
+    REMOVE: [["Event", "GuildScheduledEvent"]],
+    USER_ADD: [["Event", "GuildScheduledEvent"],["User", "User"]],
+    USER_REMOVE: [["Event", "GuildScheduledEvent"],["User", "User"]],
+  },
+  automod_rule_event: {
+    CREATE: [["Rule", "AutoModerationRule"]],
+    UPDATE: [["Old Rule", "AutoModerationRule"], ["New Rule", "AutoModerationRule"]],
+    DELETE: [["Rule", "AutoModerationRule"]],
+  },
+  shard_event: {
+    READY: [["Shard ID", "string"]],
+    RESUME: [["Shard ID", "string"]],
+  },
+  audit_log_event: [["Entry", "GuildAuditLogsEntry"]],
+  invite_event: {
+    CREATE: [["Invite", "Invite"]],
+    DELETE: [["Invite", "Invite"]],
+  },
+  webhook_event: [["Channel", "Channel"]],
+  user_event: [["Old User", "User"],["New User", "User"]],
+  stage_event: {
+    CREATE: [["Stage", "StageInstance"]],
+    UPDATE: [["Old Stage", "StageInstance"], ["New Stage", "StageInstance"]],
+    DELETE: [["Stage", "StageInstance"]],
+  },
+  thread_event: {
+    CREATE: [["Channel", "Channel"]],
+    UPDATE: [["Old Channel", "Channel"], ["New Channel", "StageInstance"]],
+    DELETE: [["Channel", "Channel"]],
   },
 };
 const ArgumentEventHandler = function(block) {

@@ -165,6 +165,7 @@ python.pythonGenerator.forBlock['event_arg_placeholder'] = function(block, gener
 
 // EVENT BOOLS
 
+python.pythonGenerator.forBlock['botready'] = pyEventConverter('ready')
 python.pythonGenerator.forBlock['channel_event'] = pyEventConverter('guild_channel')
 python.pythonGenerator.forBlock['message_event'] = pyEventConverter('message',['',null,null])
 python.pythonGenerator.forBlock['message_reaction_event'] = pyEventConverter('reaction',[null,null,'_clear'])
@@ -178,11 +179,6 @@ python.pythonGenerator.forBlock['guild_role_event'] = pyEventConverter('guild_ro
 python.pythonGenerator.forBlock['guild_scheduled_event_event'] = pyEventConverter('scheduled_event')
 
 
-python.pythonGenerator.forBlock['botready'] = function(block, generator) {
-  var code = 'on_ready';
-  block.genEventRags = [];
-  return [code, python.Order.NONE];
-};
 
 // INSTANCES
 
@@ -283,15 +279,22 @@ python.pythonGenerator.forBlock['token_input'] = function(block, generator) {
 
 function pyEventConverter(eventPrefix,manualCycle) {
   return function(block, generator) {
-    const field = block.getField('EVENT')
-    const cycleIndex = parseInt(field.menuGenerator_.map(option => option[1]).indexOf(field.selectedOption[1]));
+    var eventSuffix = '';
     var name = block.getFieldValue('EVENT');
-    if (manualCycle != undefined && manualCycle[cycleIndex] != null){
-      var code = 'on_' + eventPrefix + manualCycle[cycleIndex];
-    }else{
-      var code = 'on_'+eventPrefix + '_' + name.toLowerCase();
+    if (name == null) {
+      block.genEventRags = globalEventArguments[block.type] || [];
     }
-    block.genEventRags = globalEventArguments[block.type]?.[name] || [];
+    else {
+      block.genEventRags = globalEventArguments[block.type]?.[name] || [];
+      const field = block.getField('EVENT');
+      const cycleIndex = parseInt(field.menuGenerator_.map(option => option[1]).indexOf(field.selectedOption[1]));
+      if (manualCycle != undefined && manualCycle[cycleIndex] != null){
+        eventSuffix = manualCycle[cycleIndex];
+      }else{
+        eventSuffix = '_' + name.toLowerCase();
+      }
+    }
+    var code = 'on_' + eventPrefix + eventSuffix;
     return [code, python.Order.NONE];
   };
 }

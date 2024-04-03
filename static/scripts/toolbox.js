@@ -211,6 +211,58 @@ var toolbox = {
             'type': 'guild_scheduled_event_event',
             'kind': 'block',
           },
+          {
+            'type': 'automod_rule_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'automod_action_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'channel_typing_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'shard_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'audit_log_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'invite_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'webhook_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'interaction_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'user_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'presence_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'voice_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'stage_event',
+            'kind': 'block',
+          },
+          {
+            'type': 'thread_event',
+            'kind': 'block',
+          },
 
         ]
       },
