@@ -163,15 +163,59 @@ javascript.javascriptGenerator.forBlock['get_by_id'] = function(block, generator
 
 // EVENTS
 
+let jsCustomEventListener = {
+  channel_typing_event: function(eventType, eventArgs) {
+    //code
+    return {
+      eventArgs: "event_Typing",
+      initialCode: `
+        const event_channel = event_Typing.channel;
+        const event_user = event_Typing.user;
+      `,
+    };
+  },
+  booster_event: function(eventType, eventArgs) {
+    //code
+    return {
+      eventType: "GuildMemberUpdate",
+      eventArgs: "event_OldMember, event_member",
+      initialCode: /*js*/`
+        const event_Reboosted = event_member.premiumSinceTimestamp != null && (event_member.premiumSinceTimestamp != event_OldMember.premiumSinceTimestamp);
+        if (event_Reboosted != true) {
+          //check for booster role
+          const event_HadRole = event_OldMember.roles.cache.find(role => (typeof role.tags?.["premium_subscriber"] != "undefined"));
+          const event_HasRole = event_member.roles.cache.find(role => (typeof role.tags?.["premium_subscriber"] != "undefined"));
+
+          if (!(!event_HadRole && event_HasRole)) return;
+        }
+      `,
+    };
+  },
+};
+
 const eventListenerBlocks = function(block, generator) {
-  const value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
+  let value_event = generator.valueToCode(block, 'EVENT', javascript.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
   const eventBlock = block.getInputTargetBlock("EVENT");
   let argsString = eventBlock?.genEventRags.map(x => "event_"+to_snake_case(x[0])).join(", ") || "";
+  let initialCode = "";
+
+  let customEvent = jsCustomEventListener[eventBlock?.type]?.(value_event,  eventBlock?.genEventRags);
+  if (customEvent != null) {
+    value_event = 'Discord.Events.'+customEvent.eventType || value_event;
+    argsString = customEvent.eventArgs;
+    let initialCodeLines = customEvent.initialCode
+      .split("\n")
+      .filter((x,i,list) => !((i == 0 || i + 1 == list.length) && x.trim() == ""));
+    let startSpaces = (initialCodeLines[0].length - initialCodeLines[0].trimStart().length);
+    initialCode = initialCodeLines
+      .map(x => "  "+x.slice(startSpaces))
+      .join("\n")+"\n\n";
+  }
 
   var eventType = block.type;
   if (eventType == "when") eventType = "on";
-  var code = `client.${eventType}(${value_event}, async(${argsString}) => {\n${innerCode}});\n`;
+  var code = `client.${eventType}(${value_event}, async(${argsString}) => {\n${initialCode}${innerCode}});\n`;
   return code;
 };
 javascript.javascriptGenerator.forBlock['once'] = eventListenerBlocks;
@@ -208,14 +252,18 @@ javascript.javascriptGenerator.forBlock['presence_event'] = jsEventConverter("Pr
 javascript.javascriptGenerator.forBlock['voice_event'] = jsEventConverter("VoiceStateUpdate");
 javascript.javascriptGenerator.forBlock['stage_event'] = jsEventConverter("StageInstance");
 javascript.javascriptGenerator.forBlock['thread_event'] = jsEventConverter("Thread");
+javascript.javascriptGenerator.forBlock['booster_event'] = jsEventConverter("");
 
 // INSTANCES
 
 let jsTypeProperties = {
-  Message: function(parentValue, dropdown_value, block, generator) {
+  Message: function(parentValue, dropdown_value) {
     var code = "null";
 
     switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
       case "CONTENT":
         code = `${parentValue}.content`;
         break;
@@ -228,50 +276,282 @@ let jsTypeProperties = {
       case "USER":
         code = `${parentValue}.author`;
         break;
-      case "ID":
-        code = `${parentValue}.id`;
+      case "MEMBER":
+        code = `${parentValue}.member`;
+        break;
+      case "URL":
+        code = `${parentValue}.url`;
         break;
     }
 
     return code;
   },
-  Guild: function(parentValue, dropdown_value, block, generator) {
+  Channel: function(parentValue, dropdown_value) {
     var code = "null";
 
     switch (dropdown_value) {
       case "ID":
         code = `${parentValue}.id`;
         break;
-    }
-
-    return code;
-  },
-  Channel: function(parentValue, dropdown_value, block, generator) {
-    var code = "null";
-
-    switch (dropdown_value) {
       case "NAME":
         code = `${parentValue}.name`;
         break;
       case "SERVER":
         code = `${parentValue}.guild`;
         break;
-      case "ID":
-        code = `${parentValue}.id`;
+      case "URL":
+        code = `${parentValue}.url`;
         break;
     }
 
     return code;
   },
-  Guild: function(parentValue, dropdown_value, block, generator) {
+  Guild: function(parentValue, dropdown_value) {
     var code = "null";
 
     switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
       case "NAME":
         code = `${parentValue}.name`;
         break;
+      case "DESCRIPTION":
+        code = `${parentValue}.description`;
+        break;
+      case "ICON_URL":
+        code = `${parentValue}.iconURL()`;
+        break;
+      case "MEMBER_COUNT":
+        code = `${parentValue}.memberCount`;
+        break;
+      case "BOOST_LEVEL":
+        code = `${parentValue}.premiumTier`;
+        break;
+      case "BOOST_COUNT":
+        code = `${parentValue}.premiumSubscriptionCount`;
+        break;
+      case "RULES_CHANNEL":
+        code = `${parentValue}.rulesChannel`;
+        break;
+      case "OWNER_ID":
+        code = `${parentValue}.ownerId`;
+        break;
+    }
+
+    return code;
+  },
+  Member: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
       case "ID":
         code = `${parentValue}.id`;
+        break;
+      case "USER":
+        code = `${parentValue}.user`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+      case "DISPLAY_NAME":
+        code = `${parentValue}.displayName`;
+        break;
+      case "AVATAR_ICON_URL":
+        code = `${parentValue}.avatarURL()`;
+        break;
+      case "DM_CHANNEL":
+        code = `${parentValue}.dmChannel`;
+        break;
+      case "TOP_ROLE":
+        code = `${parentValue}.roles.highest`;
+        break;
+    }
+
+    return code;
+  },
+  User: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+      case "DISPLAY_NAME":
+        code = `${parentValue}.displayName`;
+        break;
+      case "AVATAR_ICON_URL":
+        code = `${parentValue}.avatarURL()`;
+        break;
+      case "DM_CHANNEL":
+        code = `${parentValue}.dmChannel`;
+        break;
+      case "USERNAME":
+        code = `${parentValue}.username`;
+        break;
+    }
+
+    return code;
+  },
+  MessageReaction: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "COUNT":
+        code = `${parentValue}.count`;
+        break;
+      case "MESSAGE":
+        code = `${parentValue}.message`;
+        break;
+      case "EMOJI_TEXT":
+        code = `${parentValue}.emoji.toString()`;
+        break;
+    }
+
+    return code;
+  },
+  Role: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+      case "NAME":
+        code = `${parentValue}.name`;
+        break;
+      case "PING_TEXT":
+        code = `${parentValue}.user`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+    }
+
+    return code;
+  },
+  GuildScheduledEvent: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+      case "NAME":
+        code = `${parentValue}.name`;
+        break;
+      case "DESCRIPTION":
+        code = `${parentValue}.description`;
+        break;
+      case "URL":
+        code = `${parentValue}.url`;
+        break;
+      case "CHANNEL":
+        code = `${parentValue}.channel`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+      case "USER_COUNT":
+        code = `${parentValue}.userCount`;
+        break;
+      case "LOCATION_TEXT":
+        code = `${parentValue}.entityMetadata?.location`;
+        break;
+      case "CREATOR":
+        code = `${parentValue}.creator`;
+        break;
+    }
+
+    return code;
+  },
+  AutoModerationRule: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+      case "NAME":
+        code = `${parentValue}.name`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+      case "CREATOR_ID":
+        code = `${parentValue}.creatorId`;
+        break;
+    }
+
+    return code;
+  },
+  GuildAuditLogsEntry: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+      case "EXECUTER":
+        code = `${parentValue}.executor`;
+        break;
+      case "REASON":
+        code = `${parentValue}.reason`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+    }
+
+    return code;
+  },
+  Invite: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+      case "URL":
+        code = `${parentValue}.url`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+      case "INVITER":
+        code = `${parentValue}.inviter`;
+        break;
+      case "CHANNEL":
+        code = `${parentValue}.channel`;
+        break;
+      case "USES":
+        code = `${parentValue}.uses`;
+        break;
+      case "MAX_USES":
+        code = `${parentValue}.maxUses`;
+        break;
+      case "CODE":
+        code = `${parentValue}.code`;
+        break;
+    }
+
+    return code;
+  },
+  StageInstance: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+      case "SERVER":
+        code = `${parentValue}.guild`;
+        break;
+      case "STAGE_CHANNEL":
+        code = `${parentValue}.channel`;
+        break;
+      case "TOPIC":
+        code = `${parentValue}.topic`;
         break;
     }
 
@@ -286,7 +566,7 @@ javascript.javascriptGenerator.forBlock['property_of'] = function(block, generat
 
   const ParentType = block.getInput("VALUE_PARENT").connection.targetConnection?.getCheck()?.[0];
   if (ParentType != null) {
-    let code = jsTypeProperties[ParentType]?.(PARENT, CHILD, block, generator);
+    let code = jsTypeProperties[ParentType]?.(PARENT, CHILD);
       if (code) return [code, javascript.Order.NONE];
     }
 

@@ -718,6 +718,15 @@ Blockly.defineBlocksWithJsonArray([
   "tooltip": "Represents a boolean value indicating whether an action related to stage channels has occurred.",
   "helpUrl": ""
 },
+{
+  "type": "booster_event",
+  "message0": "Server Boosted",
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": '%{BKY_EVENT_HUE}',
+  "tooltip": "Triggers whenever a member boosts the server.",
+  "helpUrl": ""
+},
 ])
 
 
@@ -762,10 +771,18 @@ Blockly.Blocks['reaction_action'] = {
 }
 
 const property_of_Dict = {
-  'Message' : [['id','string'],['content','string'],['channel','Channel'],['server','Guild'],['user','User']],
-  'Channel' : [['id','string'],['name','string'],['server','Guild']],
-  'Guild' : [['id','string'],['name','string']],
-  'User': [['id','string']],
+  'Message' : [['id','string'],['content','string'],['channel','Channel'],['server','Guild'],['user','User'],['member','Member'],['url','string']],
+  'Channel' : [['id','string'],['name','string'],['server','Guild'],['url','string']],
+  'Guild' : [['id','string'],['name','string'],['description','string'],['icon url','string'],['member count','number'],['boost level','number'],['boost count','number'],['rules channel','Channel'],['owner id','string']],
+  'Member': [['id','string'],['user','User'],['server','Guild'],['display name','string'],['avatar icon url','string'],['DM Channel','Channel'],['top role','Role']], // TODO: add is booster property (idk what output should be)
+  'User': [['id','string'],['display name','string'],['username','string'],['DM Channel','Channel'],['avatar icon url','string']],// TODO: add is bot property (idk what output should be)
+  'MessageReaction': [['count','number'],['message','Message'],["emoji text", "string"]],
+  'Role': [['id','string'],['name','string'],['server','Guild'],['ping text','string']],
+  'GuildScheduledEvent': [['id','string'],['name','string'],['description','string'],['url','string'],['server','Guild'],['channel','Channel'],['user count','number'],['location text','string'],['creator','User']],
+  'AutoModerationRule': [['id','string'],['name','string'],['server','Guild'],['creator id','string']],
+  'GuildAuditLogsEntry': [['id','string'],['executer','User'],['reason','string']],
+  'Invite': [['id','string'],['url','string'],['server','Guild'],['inviter','User'],['channel','Channel'],['uses','number'],['max uses','number'],['code','string']],
+  'StageInstance': [['id','string'],['server','Guild'],['stage channel','Channel'],['topic','string']],
 }
 Blockly.Blocks['property_of'] = {
   validate: function(newValue) {
@@ -795,7 +812,7 @@ Blockly.Blocks['property_of'] = {
   },
   loadExtraState: function(state) {
     let defaultOptions = this.dropdownDefaultOptions;
-    this.latestOptionsValues = state['propertyOptions'] || defaultOptions;
+    this.latestOptionsValues = this.latestOptionsValues || state['propertyOptions'] || defaultOptions;
     this.removeInput("VALUE_CHILD",true);
 
     const block = this;
@@ -945,7 +962,6 @@ let globalEventArguments = {
     ADD: [["Member", "Member"]],
     UPDATE: [["Old Member", "Member"], ["New Member", "Member"]],
     REMOVE: [["Member", "Member"]],
-    // AVAILABLE: [["Member", "Member"]], // TODO: not available in python
   },
   guild_role_event: {
     CREATE: [["Role", "Role"]],
@@ -953,9 +969,9 @@ let globalEventArguments = {
     DELETE: [["Role", "Role"]],
   },
   guild_scheduled_event_event: {
-    ADD: [["Event", "GuildScheduledEvent"]],
+    CREATE: [["Event", "GuildScheduledEvent"]],
     UPDATE: [["Old Event", "GuildScheduledEvent"], ["New Event", "GuildScheduledEvent"]],
-    REMOVE: [["Event", "GuildScheduledEvent"]],
+    DELETE: [["Event", "GuildScheduledEvent"]],
     USER_ADD: [["Event", "GuildScheduledEvent"],["User", "User"]],
     USER_REMOVE: [["Event", "GuildScheduledEvent"],["User", "User"]],
   },
@@ -964,6 +980,7 @@ let globalEventArguments = {
     UPDATE: [["Old Rule", "AutoModerationRule"], ["New Rule", "AutoModerationRule"]],
     DELETE: [["Rule", "AutoModerationRule"]],
   },
+  channel_typing_event: [["Channel", "Channel"],["User", "User"]],
   shard_event: {
     READY: [["Shard ID", "string"]],
     RESUME: [["Shard ID", "string"]],
@@ -985,6 +1002,7 @@ let globalEventArguments = {
     UPDATE: [["Old Channel", "Channel"], ["New Channel", "StageInstance"]],
     DELETE: [["Channel", "Channel"]],
   },
+  booster_event: [["Member", "Member"]],
 };
 const ArgumentEventHandler = function(block) {
   const eventBlock = block.getInputTargetBlock("EVENT");

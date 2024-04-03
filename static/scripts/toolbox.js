@@ -263,6 +263,10 @@ var toolbox = {
             'type': 'thread_event',
             'kind': 'block',
           },
+          {
+            'type': 'booster_event',
+            'kind': 'block',
+          },
 
         ]
       },

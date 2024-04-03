@@ -144,14 +144,46 @@ python.pythonGenerator.forBlock['get_by_id'] = function(block, generator) {
 
 // EVENTS
 
+let pyCustomEventListener = {
+  booster_event: function(eventType, eventArgs) {
+    //code
+    return {
+      eventType: "member_update",
+      eventArgs: "event_OldMember, event_member",
+      initialCode: /*py*/`
+        event_Reboosted = event_member.premium_since != None and (event_member.premium_since != event_OldMember.premium_since)
+        if event_Reboosted is not True:
+          # check for booster role
+          event_HadRole = next((x for x in event_OldMember.roles if x.is_premium_subscriber()), None)
+          event_HasRole = next((x for x in event_member.roles if x.is_premium_subscriber()), None)
+
+          if not (event_HadRole == None and event_HasRole != None): return
+      `,
+    };
+  },
+};
 
 const pyeventListener = function(block,generator){
-  const value_event = generator.valueToCode(block, 'EVENT', python.Order.NONE);
+  let value_event = generator.valueToCode(block, 'EVENT', python.Order.NONE);
   const innerCode = generator.statementToCode(block, 'DO');
   const eventBlock = block.getInputTargetBlock("EVENT");
   let argsString = eventBlock?.genEventRags.map(x => "event_"+to_snake_case(x[0])).join(", ") || "";
+  let initialCode = "";
 
-  var code = `@client.event\nasync def ${value_event}(${argsString}):\n${innerCode}\n`;
+  let customEvent = pyCustomEventListener[eventBlock?.type]?.(value_event,  eventBlock?.genEventRags);
+  if (customEvent != null) {
+    value_event = 'on_'+customEvent.eventType || value_event;
+    argsString = customEvent.eventArgs;
+    let initialCodeLines = customEvent.initialCode
+      .split("\n")
+      .filter((x,i,list) => !((i == 0 || i + 1 == list.length) && x.trim() == ""));
+    let startSpaces = (initialCodeLines[0].length - initialCodeLines[0].trimStart().length);
+    initialCode = initialCodeLines
+      .map(x => "  "+x.slice(startSpaces))
+      .join("\n")+"\n\n";
+  }
+
+  var code = `@client.event\nasync def ${value_event}(${argsString}):\n${initialCode}${innerCode}\n`;
   return code;
 };
 
@@ -177,13 +209,14 @@ python.pythonGenerator.forBlock['guild_member_event'] = pyEventConverter('member
 python.pythonGenerator.forBlock['guild_member_moderate_event'] = pyEventConverter('member')
 python.pythonGenerator.forBlock['guild_role_event'] = pyEventConverter('guild_role')
 python.pythonGenerator.forBlock['guild_scheduled_event_event'] = pyEventConverter('scheduled_event')
+python.pythonGenerator.forBlock['booster_event'] = pyEventConverter("")
 
 
 
 // INSTANCES
 
 let pyTypeProperties = {
-  Message: function(parentValue, dropdown_value, block, generator) {
+  Message: function(parentValue, dropdown_value) {
     var code = "null";
 
     switch (dropdown_value) {
@@ -206,6 +239,20 @@ let pyTypeProperties = {
 
     return code;
   },
+  Member: function(parentValue, dropdown_value) {
+    var code = "null";
+
+    switch (dropdown_value) {
+      case "USER":
+        code = `${parentValue}`;
+        break;
+      case "ID":
+        code = `${parentValue}.id`;
+        break;
+    }
+
+    return code;
+  },
 };
 
 python.pythonGenerator.forBlock['property_of'] = function(block, generator) {
@@ -215,7 +262,7 @@ python.pythonGenerator.forBlock['property_of'] = function(block, generator) {
 
   const ParentType = block.getInput("VALUE_PARENT").connection.targetConnection?.getCheck()?.[0];
   if (ParentType != null) {
-    let code = pyTypeProperties[ParentType]?.(PARENT, CHILD, block, generator);
+    let code = pyTypeProperties[ParentType]?.(PARENT, CHILD);
     if (code) return [code, python.Order.NONE];
     }
 
